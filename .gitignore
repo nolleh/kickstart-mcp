@@ -1,0 +1,6 @@
+dist
+.pytest_cache
+.venv
+__pycache__
+mcp-weather
+test.json
