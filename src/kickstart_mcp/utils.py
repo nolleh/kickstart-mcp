@@ -1,30 +1,35 @@
 from colorama import init, Fore, Style
 
 class Prompt:
-    def box(self, message: str):
-        box_width = 40
-        box_top = Fore.CYAN + Style.BRIGHT + "╔" + "═" * box_width + "╗"
-        box_bottom = Fore.CYAN + Style.BRIGHT + "╚" + "═" * box_width + "╝"
-        box_side = Fore.CYAN + Style.BRIGHT + "║"
+    def __init__(self):
+        self.clear_screen = "\033[2J"  # Clear screen
+        self.move_cursor = "\033[H"    # Move cursor to top-left
+        self.hide_cursor = "\033[?25l" # Hide cursor
+        self.show_cursor = "\033[?25h" # Show cursor
 
-        # Center the welcome message
-        message = "Welcome to the kickstart-mcp."
-        centered_message = message.center(box_width)
+    def clear(self):
+        """Clear the screen and move cursor to top"""
+        print(self.clear_screen + self.move_cursor, end="", flush=True)
 
-        # Print the welcome message in a box
-        print(box_top)
-        print(box_side + " " * box_width + box_side)
-        print(box_side + centered_message + box_side)
-        print(box_side + " " * box_width + box_side)
-        print(box_bottom)
+    def box(self, text: str):
+        """Display text in a box"""
+        width = len(text) + 4
+        print("+" + "-" * (width - 2) + "+")
+        print(f"| {text} |")
+        print("+" + "-" * (width - 2) + "+")
 
-    def instruct(self, message: str):
-        print(Fore.YELLOW + Style.BRIGHT + message)
+    def instruct(self, text: str):
+        """Display instruction text"""
+        print(text)
 
-    def read(self, message: str):
-        return input(Fore.GREEN + message).strip()
+    def error(self, text: str):
+        """Display error text"""
+        print(f"\033[91m{text}\033[0m")  # Red color
 
-    def error(self, message: str):
-        print(Fore.RED + message)
-    def success(self, message: str):
-        print(Fore.GREEN + message)
+    def success(self, text: str):
+        """Display success text"""
+        print(f"\033[92m{text}\033[0m")  # Green color
+
+    def read(self, prompt: str) -> str:
+        """Read input from user"""
+        return input(prompt)

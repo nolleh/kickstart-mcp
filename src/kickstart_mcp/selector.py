@@ -21,6 +21,7 @@ class Selector:
         self.state = TutorialState()
         self.current_position = 0
         self.current_group = "basics"
+        self.prompter = Prompt()
         self._load_tutorials()
         # Restore last position and group if exists
         last_pos = self.state.get_last_position()
@@ -80,27 +81,28 @@ class Selector:
 
     def _display_progress(self):
         """Display overall progress and group progress"""
-        prompter = Prompt()
         total_progress = self.state.get_total_progress()
-        prompter.instruct(f"\nOverall Progress: {total_progress:.1%}")
+        self.prompter.instruct(f"\nOverall Progress: {total_progress:.1%}")
         
         if self.current_group:
             group_progress = self.state.get_group_progress(self.current_group)
             group_name = self.state.groups[self.current_group].name
-            prompter.instruct(f"{group_name} Progress: {group_progress:.1%}")
+            self.prompter.instruct(f"{group_name} Progress: {group_progress:.1%}")
 
     def _display_tutorials(self):
         """Display available tutorials with their descriptions"""
-        prompter = Prompt()
-        prompter.box("Available Tutorials")
+        # Clear screen and move cursor to top
+        self.prompter.clear()
+        
+        self.prompter.box("Available Tutorials")
         
         # Display groups
         for group_name, group in self.state.groups.items():
             # Add group header with progress
             progress = self.state.get_group_progress(group_name)
             cursor = ">" if group_name == self.current_group else " "
-            prompter.instruct(f"\n{cursor} {group.name} ({progress:.1%})")
-            prompter.instruct(f"   {group.description}")
+            self.prompter.instruct(f"\n{cursor} {group.name} ({progress:.1%})")
+            self.prompter.instruct(f"   {group.description}")
             
             # Display tutorials in this group
             if group_name == self.current_group:
@@ -109,10 +111,10 @@ class Selector:
                     if tutorial:
                         status = "✓ " if self.state.is_tutorial_completed(tutorial.name) else "  "
                         cursor = ">" if i == self.current_position else " "
-                        prompter.instruct(f"  {cursor} {status}{tutorial.name}")
-                        prompter.instruct(f"     {tutorial.description}")
+                        self.prompter.instruct(f"  {cursor} {status}{tutorial.name}")
+                        self.prompter.instruct(f"     {tutorial.description}")
         
-        prompter.instruct("\nUse ↑↓ to navigate, Enter to select, 'q' to quit")
+        self.prompter.instruct("\nUse ↑↓ to navigate, Enter to select, 'q' to quit")
         self._display_progress()
 
     def select(self) -> bool:
@@ -121,60 +123,67 @@ class Selector:
             print("No tutorials available.")
             return False
 
-        while True:
-            self._display_tutorials()
-            
-            # Get keypress
-            key = self._get_key()
-            
-            if key == 'q':
-                return False
-            elif key == '\r':  # Enter key
+        # Hide cursor at the start
+        print(self.prompter.hide_cursor, end="", flush=True)
+
+        try:
+            while True:
+                self._display_tutorials()
+                
+                # Get keypress
+                key = self._get_key()
+                
+                if key == 'q':
+                    return False
+                elif key == '\r':  # Enter key
+                    if self.current_group:
+                        group = self.state.groups[self.current_group]
+                        if 0 <= self.current_position < len(group.tutorials):
+                            tutorial_name = group.tutorials[self.current_position]
+                            tutorial = next((t for t in self.tutorials if t.name == tutorial_name), None)
+                            if tutorial:
+                                self.state.set_current_tutorial(tutorial.name)
+                                self._run_tutorial(tutorial)
+                                self.state.mark_tutorial_completed(tutorial.name)
+                                return True
+                elif key == '\x1b':  # Escape sequence
+                    next_key = self._get_key()
+                    if next_key == '[':
+                        direction = self._get_key()
+                        if direction == 'A':  # Up arrow
+                            if self.current_group:
+                                group = self.state.groups[self.current_group]
+                                self.current_position = (self.current_position - 1) % len(group.tutorials)
+                        elif direction == 'B':  # Down arrow
+                            if self.current_group:
+                                group = self.state.groups[self.current_group]
+                                self.current_position = (self.current_position + 1) % len(group.tutorials)
+                        elif direction == 'C':  # Right arrow
+                            # Move to next group
+                            group_names = list(self.state.groups.keys())
+                            if self.current_group:
+                                current_idx = group_names.index(self.current_group)
+                                self.current_group = group_names[(current_idx + 1) % len(group_names)]
+                                self.current_position = 0
+                            else:
+                                self.current_group = group_names[0]
+                        elif direction == 'D':  # Left arrow
+                            # Move to previous group
+                            group_names = list(self.state.groups.keys())
+                            if self.current_group:
+                                current_idx = group_names.index(self.current_group)
+                                self.current_group = group_names[(current_idx - 1) % len(group_names)]
+                                self.current_position = 0
+                            else:
+                                self.current_group = group_names[-1]
+                
+                # Save current position and group
+                self.state.set_last_position(self.current_position)
                 if self.current_group:
-                    group = self.state.groups[self.current_group]
-                    if 0 <= self.current_position < len(group.tutorials):
-                        tutorial_name = group.tutorials[self.current_position]
-                        tutorial = next((t for t in self.tutorials if t.name == tutorial_name), None)
-                        if tutorial:
-                            self.state.set_current_tutorial(tutorial.name)
-                            self._run_tutorial(tutorial)
-                            self.state.mark_tutorial_completed(tutorial.name)
-                            return True
-            elif key == '\x1b':  # Escape sequence
-                next_key = self._get_key()
-                if next_key == '[':
-                    direction = self._get_key()
-                    if direction == 'A':  # Up arrow
-                        if self.current_group:
-                            group = self.state.groups[self.current_group]
-                            self.current_position = (self.current_position - 1) % len(group.tutorials)
-                    elif direction == 'B':  # Down arrow
-                        if self.current_group:
-                            group = self.state.groups[self.current_group]
-                            self.current_position = (self.current_position + 1) % len(group.tutorials)
-                    elif direction == 'C':  # Right arrow
-                        # Move to next group
-                        group_names = list(self.state.groups.keys())
-                        if self.current_group:
-                            current_idx = group_names.index(self.current_group)
-                            self.current_group = group_names[(current_idx + 1) % len(group_names)]
-                            self.current_position = 0
-                        else:
-                            self.current_group = group_names[0]
-                    elif direction == 'D':  # Left arrow
-                        # Move to previous group
-                        group_names = list(self.state.groups.keys())
-                        if self.current_group:
-                            current_idx = group_names.index(self.current_group)
-                            self.current_group = group_names[(current_idx - 1) % len(group_names)]
-                            self.current_position = 0
-                        else:
-                            self.current_group = group_names[-1]
-            
-            # Save current position and group
-            self.state.set_last_position(self.current_position)
-            if self.current_group:
-                self.state.set_last_group(self.current_group)
+                    self.state.set_last_group(self.current_group)
+        finally:
+            # Show cursor when exiting
+            print(self.prompter.show_cursor, end="", flush=True)
 
     def _run_tutorial(self, tutorial: Tutorial):
         """Run the selected tutorial"""
