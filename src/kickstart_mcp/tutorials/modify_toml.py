@@ -165,8 +165,11 @@ class ModifyToml(TutorialBase):
 
         prompter.instruct("Now we need to add a script entry to your pyproject.toml file.")
         prompter.instruct("Add the following under [project]:")
-        prompter.intense_instruct("[project.scripts]")
-        prompter.intense_instruct('mcp-weather = "mcp_weather:main"')
+        snippet = '''
+[project.scripts]
+'mcp-weather = "mcp_weather:main"')
+'''
+        prompter.snippet(snippet)
 
         prompter.instruct("\nThis modification will inform entry point to execute.", Fore.YELLOW + Style.BRIGHT)
         prompter.instruct("The mcp_weather is searched from ./src folder, and then mcp_weather > main ")

@@ -32,7 +32,8 @@ dependencies = [
   "click",
   "dotenv",
   "tomli",
-  "tomli-w"
+  "tomli-w",
+  "pygments"
 ]
 
 [project.scripts]

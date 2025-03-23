@@ -1,9 +1,19 @@
 from io import text_encoding
 from colorama import init, Fore, Style
 import os
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters import TerminalFormatter
 
 class Theme:
     def __init__(self):
+        # Box characters (using ASCII characters)
+        self.box_top_left = "+"
+        self.box_top_right = "+"
+        self.box_bottom_left = "+"
+        self.box_bottom_right = "+"
+        self.box_horizontal = "-"
+        self.box_vertical = "|"
         
         # Colors
         self.title_color = Fore.CYAN + Style.BRIGHT
@@ -72,6 +82,60 @@ class Prompt:
     def read(self, prompt: str) -> str:
         """Read input from user"""
         return input(self.theme.text_color + prompt + self.theme.reset).strip()
+
+    def snippet(self, text: str, language: str | None = "python"):
+        """Display code snippet with syntax highlighting"""
+        try:
+            if language is not None:
+                # Get the lexer for the specified language
+                lexer = get_lexer_by_name(language)
+                
+                # Highlight the code
+                text = highlight(text, lexer, TerminalFormatter())
+                
+            # Split the highlighted code into lines
+            lines = text.split('\n')
+            # Remove the last empty line if it exists
+            if lines[-1] == '':
+                lines = lines[:-1]
+            
+            # Find the longest line length (excluding ANSI escape codes)
+            max_line_length = max(len(line) for line in lines)
+            
+            # Calculate box width (add 4 for padding)
+            box_width = max_line_length + 4
+            box_width = min(box_width, self.terminal_width - 4)
+            
+            # Create box parts
+            top_line = (self.theme.box_top_left + 
+                       self.theme.box_horizontal * (box_width - 2) + 
+                       self.theme.box_top_right)
+            bottom_line = (self.theme.box_bottom_left + 
+                          self.theme.box_horizontal * (box_width - 2) + 
+                          self.theme.box_bottom_right)
+            
+            # Print the box top
+            print(self.theme.title_color + top_line + self.theme.reset)
+            
+            # Print each line of code with proper indentation
+            for line in lines:
+                # Calculate padding to fill the box width
+                visible_length = len(line) - len(line.split('\033[')[0])  # Remove ANSI codes from length calculation
+                padding = box_width - visible_length - 4
+                # Print the line with box sides
+                print(self.theme.box_vertical + 
+                      " " + 
+                      line + 
+                      " " * padding + 
+                      self.theme.box_vertical)
+            
+            # Print the box bottom
+            print(self.theme.title_color + bottom_line + self.theme.reset)
+            
+        except Exception as e:
+            # Fallback to non-highlighted version if highlighting fails
+            print(f"Warning: Syntax highlighting failed: {e}")
+            self.snippet(text, language=None)
 
     def format_tutorial_item(self, cursor: str, status: str, name: str, description: str, is_selected: bool = False) -> str:
         """Format a tutorial item with proper colors and styling"""

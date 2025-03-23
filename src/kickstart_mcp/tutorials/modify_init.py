@@ -17,10 +17,14 @@ class ModifyInit(TutorialBase):
         self.prompter.instruct("\nIn this tutorial, you'll learn how to modify the __init__.py file.")
         self.prompter.instruct("You'll need to add a main function that prints 'hello, world'.")
         self.prompter.instruct("\nAdd the following code to the file:")
-        self.prompter.instruct("def main():")
-        self.prompter.instruct("    print(\"hello, world\")")
-        self.prompter.instruct("if __name__ == \"__main__\":")
-        self.prompter.instruct("    main()")
+        
+        code_snippet = '''
+def main():
+    print("hello, world")
+
+if __name__ == "__main__":
+    main()'''
+        self.prompter.snippet(code_snippet)
         
         if not self.verify_file_exists(self.target_file):
             self.prompter.warn("Did you made the mcp-weather project?. \nDo previous tutorial first")
