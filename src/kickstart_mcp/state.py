@@ -38,14 +38,19 @@ class TutorialState:
     def _load_groups(self) -> Dict[str, TutorialGroup]:
         """Load tutorial groups configuration"""
         return {
-            "basics": TutorialGroup(
-                name="Basics",
+            "python-project": TutorialGroup(
+                name="Python Project",
                 description="Basic project setup and configuration",
                 tutorials=["MakingProject", "ModifyToml"]
             ),
-            "advanced": TutorialGroup(
-                name="Advanced",
-                description="Advanced features and best practices",
+            "mcp-server": TutorialGroup(
+                name="Mcp Server",
+                description="Make a MCP server",
+                tutorials=[]  # Add more tutorials as they are created
+            ),
+            "mcp-client": TutorialGroup(
+                name="Mcp Client",
+                description="Make a MCP client",
                 tutorials=[]  # Add more tutorials as they are created
             )
         }

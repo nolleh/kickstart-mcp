@@ -4,11 +4,10 @@ import inspect
 import sys
 import tty
 import termios
-import select
-import time
-from typing import List, Dict, Type, Optional
+from typing import List 
 from .utils import Prompt
-from .state import TutorialState, TutorialGroup
+from .state import TutorialState
+from enum import Enum
 
 class Tutorial:
     def __init__(self, name: str, description: str, module: str):
@@ -21,7 +20,7 @@ class Selector:
         self.tutorials: List[Tutorial] = []
         self.state = TutorialState()
         self.current_position = 0
-        self.current_group = "basics"
+        self.current_group = "python-project" 
         self.prompter = Prompt()
         self._load_tutorials()
         # Restore last position and group if exists
