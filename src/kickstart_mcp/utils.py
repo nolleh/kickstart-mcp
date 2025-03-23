@@ -16,8 +16,9 @@ class Theme:
         self.title_color = Fore.CYAN + Style.BRIGHT
         self.text_color = Fore.WHITE
         self.selected_color = Fore.GREEN + Style.BRIGHT
-        self.completed_color = Fore.YELLOW
+        self.completed_color = Fore.MAGENTA
         self.progress_color = Fore.BLUE
+        self.warning_color = Fore.YELLOW
         self.error_color = Fore.RED
         self.success_color = Fore.GREEN
         self.reset = Style.RESET_ALL
@@ -58,6 +59,9 @@ class Prompt:
         """Display instruction text"""
         print(self.theme.text_color + text + self.theme.reset)
 
+    def warn(self, text: str):
+        """Display warning text"""
+        print(self.theme.warning_color + text + self.theme.reset)
     def error(self, text: str):
         """Display error text"""
         print(self.theme.error_color + text + self.theme.reset)
