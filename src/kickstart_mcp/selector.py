@@ -5,6 +5,7 @@ import sys
 import tty
 import termios
 import select
+import time
 from typing import List, Dict, Type, Optional
 from .utils import Prompt
 from .state import TutorialState, TutorialGroup
@@ -82,18 +83,19 @@ class Selector:
     def _display_progress(self):
         """Display overall progress and group progress"""
         total_progress = self.state.get_total_progress()
-        self.prompter.instruct(f"\nOverall Progress: {total_progress:.1%}")
+        self.prompter.instruct(self.prompter.format_progress("Overall Progress", total_progress))
         
         if self.current_group:
             group_progress = self.state.get_group_progress(self.current_group)
             group_name = self.state.groups[self.current_group].name
-            self.prompter.instruct(f"{group_name} Progress: {group_progress:.1%}")
+            self.prompter.instruct(self.prompter.format_progress(f"{group_name} Progress", group_progress))
 
     def _display_tutorials(self):
         """Display available tutorials with their descriptions"""
         # Clear screen and move cursor to top
         self.prompter.clear()
         
+        # Display title
         self.prompter.box("Available Tutorials")
         
         # Display groups
@@ -111,11 +113,23 @@ class Selector:
                     if tutorial:
                         status = "✓ " if self.state.is_tutorial_completed(tutorial.name) else "  "
                         cursor = ">" if i == self.current_position else " "
-                        self.prompter.instruct(f"  {cursor} {status}{tutorial.name}")
-                        self.prompter.instruct(f"     {tutorial.description}")
+                        self.prompter.instruct(
+                            self.prompter.format_tutorial_item(
+                                cursor=cursor,
+                                status=status,
+                                name=tutorial.name,
+                                description=tutorial.description,
+                                is_selected=(i == self.current_position)
+                            )
+                        )
         
         self.prompter.instruct("\nUse ↑↓ to navigate, Enter to select, 'q' to quit")
         self._display_progress()
+
+    def _animate_selection_change(self, old_pos: int, new_pos: int):
+        """Animate the selection change"""
+        if old_pos != new_pos:
+            self._display_tutorials()
 
     def select(self) -> bool:
         """Display tutorial selection menu and run selected tutorial"""
@@ -150,6 +164,7 @@ class Selector:
                     next_key = self._get_key()
                     if next_key == '[':
                         direction = self._get_key()
+                        old_pos = self.current_position
                         if direction == 'A':  # Up arrow
                             if self.current_group:
                                 group = self.state.groups[self.current_group]
@@ -176,6 +191,9 @@ class Selector:
                                 self.current_position = 0
                             else:
                                 self.current_group = group_names[-1]
+                        
+                        # Animate selection change
+                        self._animate_selection_change(old_pos, self.current_position)
                 
                 # Save current position and group
                 self.state.set_last_position(self.current_position)
