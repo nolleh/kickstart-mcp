@@ -11,7 +11,7 @@ class MakeServer(TutorialBase):
         )
         self.target_file = "mcp-weather/src/mcp_weather/__init__.py"
         self.current_step = 1
-        self.total_steps = 2  # We'll update this as more steps are added
+        self.total_steps = 3  # Updated to include the new tool step
 
     def check(self) -> bool:
         """Check if a specific step is completed"""
@@ -31,11 +31,14 @@ class MakeServer(TutorialBase):
             # Check if run function and main are added
             # content = self.read_target_file()
             return "async def run()" in content and "def main()" in content
+        elif self.current_step == 3:
+            # Check if tools are added
+            # content = self.read_target_file()
+            return "@server.list_tools() async def list_tools() -> list[Tool]" in content
         return False
 
     def run_step(self, step_id: int) -> bool:
         """Run a specific step of the tutorial"""
-        print("run the tutorial")
         if step_id == 1:
             self.prompter.clear()
             self.prompter.box("Step 1: Create Server Instance")
@@ -55,6 +58,7 @@ class MakeServer(TutorialBase):
             self.prompter.instruct("\n3. Server instance creation:")
             self.prompter.instruct("   - Creates a new mcp.server named 'weather'")
             self.prompter.instruct("   - Attaches the lifespan manager to handle lifecycle events")
+            
             
             self.prompter.instruct("\nAdd the following code to the file:")
             self.prompter.snippet(
@@ -76,6 +80,7 @@ async def server_lifespan(server: Server) -> AsyncIterator[str]:
 
 server = Server("weather", lifespan=server_lifespan)'''
             )
+            self.prompter.instruct("You also need to add dependency in project.toml file")
             self.handle_editor_options(self.target_file)
         elif step_id == 2:
             self.prompter.clear()
@@ -91,7 +96,7 @@ server = Server("weather", lifespan=server_lifespan)'''
             self.prompter.instruct("   - Web-based communication using SSE")
             self.prompter.instruct("   - More complex but allows remote connections")
             self.prompter.intense_instruct("   - Some MCP Host doesn't support this type of connection.")
-            
+
             self.prompter.instruct("\nIn this tutorial, we'll implement a stdio server for simplicity.")
             self.prompter.instruct("The run function will set up the communication channel using stdio_server.")
             
@@ -100,21 +105,89 @@ server = Server("weather", lifespan=server_lifespan)'''
                 '''async def run():
     async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
         print("server is running...")
-        await server.run(read_stream, write_stream, 
-                         InitializationOptions(
-                             server_name = "weather",
-                             server_version = "0.1.0",
-                             capabilities = server.get_capabilities(
-                                notification_options=NotificationOptions(),
-                                experimental_capabilities={}
-                             )))
+        await server.run(
+            read_stream,
+            write_stream,
+            InitializationOptions(
+                server_name="weather",
+                server_version="0.1.0",
+                capabilities=server.get_capabilities(
+                    notification_options=NotificationOptions(),
+                    experimental_capabilities={},
+                ),
+            ),
+        )
 
 def main():
     import asyncio
     asyncio.run(run())'''
             )
+            self.prompter.instruct("You also need to add dependency in project.toml file")
             self.handle_editor_options(self.target_file)
-        return self.check()
+        elif step_id == 3:
+            self.prompter.clear()
+            self.prompter.box("Step 3: Add Tools")
+            self.prompter.instruct("\nTools are one of the core features of Model Context Protocol (MCP).")
+            self.prompter.instruct("They enable AI models to interact with external systems and perform actual tasks.")
+            
+            self.prompter.instruct("\nKey points about Tools:")
+            self.prompter.instruct("1. Model-centric control:")
+            self.prompter.instruct("   - Designed for model-centric control")
+            self.prompter.instruct("   - AI models can understand context and automatically find and call tools")
+            
+            self.prompter.instruct("\n2. Safety and reliability:")
+            self.prompter.instruct("   - User approval is always required for actual tool execution")
+            self.prompter.instruct("   - Ensures safe and controlled interaction with external systems")
+            
+            self.prompter.instruct("\n3. Input Schema:")
+            self.prompter.instruct("   - Defines the structure of input parameters for each tool")
+            self.prompter.instruct("   - Uses JSON Schema format to specify:")
+            self.prompter.instruct("     * Parameter types")
+            self.prompter.instruct("     * Parameter descriptions")
+            self.prompter.instruct("     * Required parameters")
+
+            self.prompter.instruct("\nTools structure")
+            self.prompter.snippet(
+                '''{
+  "name": "tool_name",
+  "description": "tool_description",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "paramter name": {
+        "type": "string",
+        "description": "parmeter description"
+      }
+    },
+    "required": ["required_parameter_list"]
+  }
+}''')
+            
+            self.prompter.instruct("\nAdd the following code to the file:")
+            self.prompter.snippet(
+                '''@server.list_tools()
+async def list_tools() -> list[Tool]:
+    tools = []
+    ctx = server.request_context.lifespan_context
+
+    if ctx and "weather":
+        tools.extend(
+            [
+                Tool(
+                    name="get_weather",
+                    description="Get the weather",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {"state": {"type": "string"}},
+                    },
+                )
+            ]
+        )
+    return tools'''
+            )
+            self.handle_editor_options(self.target_file)
+        ##  run is checking self.check() after finish this function 
+        return True
 
     def run(self) -> bool:
         """Run the tutorial"""
@@ -123,8 +196,9 @@ def main():
                 if not self.run_step(self.current_step):
                     return False
             else:
+                # if self.check():
                 self.prompter.intense_instruct(f"You've done step:{self.current_step}")
-                self.prompter.instruct("➤ Press any key") 
+                self.prompter.instruct("➤ 1Press any key") 
                 self.prompter.get_key()
                 self.current_step += 1
 
