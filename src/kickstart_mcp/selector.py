@@ -223,7 +223,8 @@ class Selector:
                     # Create instance and run main method
                     instance = obj()
                     instance.main()
-                    break
+                    self.select()
+
         except Exception as e:
             print(f"Error running tutorial {tutorial.name}: {e}")
 

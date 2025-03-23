@@ -98,13 +98,5 @@ def main(
     selector = Selector()
     selector.select()
 
-    # from .tutorials.make_project import MakingProject 
-    # course2 = MakingProject("name")
-    # course2.main()
-    #
-    # from .tutorials.modify_toml import ModifyToml
-    # course2 = ModifyToml("name")
-    # course2.main()
-
 if __name__ == "__main__":
     main()

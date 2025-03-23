@@ -4,6 +4,7 @@ import tomli
 import tomli_w
 import subprocess
 import platform
+from colorama import Fore, Style
 
 class ModifyToml(TutorialBase):
     def __init__(self):
@@ -197,6 +198,9 @@ class ModifyToml(TutorialBase):
         prompter.intense_instruct("[project.scripts]")
         prompter.intense_instruct("mcp-weather = mcp_weather:main")
 
+        prompter.instruct("\nThis modification will inform entry point to execute.", Fore.YELLOW + Style.BRIGHT)
+        prompter.instruct("The mcp_weather is searched from ./src folder, and then mcp_weather > main ")
+
         while True:
             # Show current content
             prompter.instruct("\nCurrent pyproject.toml content:")
@@ -232,7 +236,20 @@ class ModifyToml(TutorialBase):
                         prompter.success("Correct! You've successfully added the script entry.")
                         # Test the command
                         prompter.instruct("\nLet's test if the command works:")
-                        os.system("cd mcp-weather && hatch run mcp-weather --help")
+                        try:
+                            # subprocess.run(["cd","mcp-weather"])
+                            # subprocess.run(["hatch", "run", "mcp-weather", "-help"])
+                            result = subprocess.run(["hatch", "run", "mcp-weather", "-help"], 
+                               cwd="mcp-weather",  # 작업 디렉토리 설정
+                               check=True,
+                               text=True,
+                               capture_output=True)
+                            print(result)
+                        except subprocess.CalledProcessError as e:
+                            print(e.stderr)
+                            prompter.instruct("Oh! we added the entry point mcp_weather:main, but there isn't main func! Let's modify")
+                        finally:
+                            pass
                         break
                     else:
                         prompter.error("The script entry is not correct. Please try again.")
