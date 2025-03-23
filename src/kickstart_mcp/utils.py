@@ -4,6 +4,9 @@ import os
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import TerminalFormatter
+import sys
+import tty
+import termios
 
 class Theme:
     def __init__(self):
@@ -157,3 +160,17 @@ class Prompt:
         filled = int(bar_width * progress)
         bar = "█" * filled + "░" * (bar_width - filled)
         return f"{self.theme.progress_color}{label}: [{bar}] {progress:.1%}{self.theme.reset}"
+
+    def get_key(self):
+        """Get a single keypress from the user"""
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+            if ch == '\x03':  # Ctrl+C
+                raise KeyboardInterrupt
+            return ch
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+

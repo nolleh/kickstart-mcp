@@ -9,6 +9,7 @@ from .utils import Prompt
 from .state import TutorialState
 import traceback
 import time
+from colorama import Fore,Style
 from .tutorials.modify_toml import ModifyToml
 from .tutorials.modify_init import ModifyInit
 
@@ -125,7 +126,7 @@ class Selector:
                             )
                         )
         
-        self.prompter.instruct("\nUse ↑↓ to navigate, Enter to select, 'q' to quit")
+        self.prompter.instruct("\nUse "+ Fore.YELLOW + "↑↓→←" + Style.RESET_ALL + " to navigate, Enter to select, 'q' to quit")
         self._display_progress()
 
     def _animate_selection_change(self, old_pos: int, new_pos: int):
@@ -154,18 +155,21 @@ class Selector:
                     if direction == 'A' or key == 'k':
                         if self.current_group: 
                             group = self.state.groups[self.current_group]
-                            self.current_position = (self.current_position - 1) % len(group.tutorials)
+                            if len(group.tutorials) > 0:
+                                self.current_position = (self.current_position - 1) % len(group.tutorials)
                     elif direction == 'B' or key == 'j':
                         if self.current_group:
                             group = self.state.groups[self.current_group]
-                            self.current_position = (self.current_position + 1) % len(group.tutorials)
+                            if len(group.tutorials) > 0:
+                                self.current_position = (self.current_position + 1) % len(group.tutorials)
                     elif direction == 'C' or key == 'l':  # Right arrow
                         # Move to next group
                         group_names = list(self.state.groups.keys())
                         if self.current_group:
                             current_idx = group_names.index(self.current_group)
-                            self.current_group = group_names[(current_idx + 1) % len(group_names)]
-                            self.current_position = 0
+                            if len(group_names) > 0:
+                                self.current_group = group_names[(current_idx + 1) % len(group_names)]
+                                self.current_position = 0
                         else:
                             self.current_group = group_names[0]
                     elif direction == 'D' or key == 'h':  # Left arrow
@@ -173,8 +177,9 @@ class Selector:
                         group_names = list(self.state.groups.keys())
                         if self.current_group:
                             current_idx = group_names.index(self.current_group)
-                            self.current_group = group_names[(current_idx - 1) % len(group_names)]
-                            self.current_position = 0
+                            if len(group_names) > 0:
+                                self.current_group = group_names[(current_idx - 1) % len(group_names)]
+                                self.current_position = 0
                         else:
                             self.current_group = group_names[-1]
                 
