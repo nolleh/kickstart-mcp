@@ -54,33 +54,6 @@ class ModifyToml(TutorialBase):
         self.project_dir = "mcp-weather"
         self.editor = self._get_default_editor()
 
-    def _get_default_editor(self):
-        """Get the default editor based on environment variables or system preferences"""
-        # Check environment variables first
-        editor = os.environ.get('EDITOR') or os.environ.get('VISUAL')
-        if editor:
-            return editor
-
-        # Check common editors based on OS
-        if platform.system() == 'Darwin':  # macOS
-            if os.path.exists('/usr/local/bin/code'):  # VS Code
-                return 'code'
-            elif os.path.exists('/usr/local/bin/subl'):  # Sublime Text
-                return 'subl'
-        elif platform.system() == 'Linux':
-            if os.path.exists('/usr/bin/code'):  # VS Code
-                return 'code'
-            elif os.path.exists('/usr/bin/subl'):  # Sublime Text
-                return 'subl'
-        elif platform.system() == 'Windows':
-            if os.path.exists('C:\\Program Files\\Microsoft VS Code\\Code.exe'):
-                return 'code'
-            elif os.path.exists('C:\\Program Files\\Sublime Text\\subl.exe'):
-                return 'subl'
-        
-        # Fallback to nano
-        return 'nano'
-
     def _open_in_editor(self, file_path):
         """Open the file in the selected editor"""
         try:

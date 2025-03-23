@@ -3,6 +3,7 @@ from typing import Optional, Callable, Any
 from .utils import Prompt
 import subprocess
 import os
+import platform
 
 class TutorialBase(ABC):
     def __init__(self, name: str, description: str):
@@ -11,6 +12,7 @@ class TutorialBase(ABC):
         self.prompter = Prompt()
         self._editor = None
         self._check_function = None
+        self.editor = self._get_default_editor()
 
     @abstractmethod
     def run(self) -> bool:
@@ -51,9 +53,11 @@ class TutorialBase(ABC):
     def open_editor(self, file_path: str, editor: Optional[str] = None) -> bool:
         """Open the specified file in the selected editor"""
         if not editor:
-            editor = self._editor or self.select_editor()
-            self._editor = editor
-
+            editor = self._get_default_editor()
+            if editor == "nano":
+                self.prompter.warn("Unable to find out default editor")
+                editor = self._editor or self.select_editor()
+                self._editor = editor
         try:
             if editor == 'code':
                 subprocess.run(['code', file_path], check=True)
@@ -69,12 +73,16 @@ class TutorialBase(ABC):
     def handle_editor_options(self, file_path: str) -> bool:
         """Handle common editor options and return True if user wants to continue"""
         while True:
-            self.prompter.clear()
-            self.prompter.box("Editor Options")
-            self.prompter.instruct("\n1. Open in editor")
-            self.prompter.instruct("2. Check changes")
+            # Get user input
+            self.prompter.instruct("\nWould you like to:")
+            self.prompter.instruct("1. Edit the file")
+            self.prompter.instruct("2. Check if changes are correct")
             self.prompter.instruct("3. Change editor")
-            self.prompter.instruct("4. Exit tutorial")
+            self.prompter.instruct("4. Exit")
+            # self.prompter.instruct("\n1. Open in editor")
+            # self.prompter.instruct("2. Check changes")
+            # self.prompter.instruct("3. Change editor")
+            # self.prompter.instruct("4. Exit tutorial")
             
             choice = self.prompter.read("\nEnter your choice (1-4): ")
             
@@ -82,6 +90,8 @@ class TutorialBase(ABC):
                 if not self.open_editor(file_path):
                     continue
             elif choice == '2':
+                # Test the command
+                self.prompter.instruct("\nLet's test if the command works:")
                 if self._check_function:
                     if self._check_function():
                         self.prompter.success("Changes look good!")
@@ -99,9 +109,9 @@ class TutorialBase(ABC):
             elif choice == '4':
                 return False
             
-            if self.prompter.read("\nContinue with tutorial? (y/n): ").lower() == 'y':
-                return True
-            return False
+            # if self.prompter.read("\nContinue with tutorial? (y/n): ").lower() == 'y':
+            #     return True
+            return True
 
     def verify_file_exists(self, file_path: str) -> bool:
         """Verify if the file exists"""
@@ -109,3 +119,30 @@ class TutorialBase(ABC):
             self.prompter.error(f"File not found: {file_path}")
             return False
         return True 
+    
+    def _get_default_editor(self):
+        """Get the default editor based on environment variables or system preferences"""
+        # Check environment variables first
+        editor = os.environ.get('EDITOR') or os.environ.get('VISUAL')
+        if editor:
+            return editor
+
+        # Check common editors based on OS
+        if platform.system() == 'Darwin':  # macOS
+            if os.path.exists('/usr/local/bin/code'):  # VS Code
+                return 'code'
+            elif os.path.exists('/usr/local/bin/subl'):  # Sublime Text
+                return 'subl'
+        elif platform.system() == 'Linux':
+            if os.path.exists('/usr/bin/code'):  # VS Code
+                return 'code'
+            elif os.path.exists('/usr/bin/subl'):  # Sublime Text
+                return 'subl'
+        elif platform.system() == 'Windows':
+            if os.path.exists('C:\\Program Files\\Microsoft VS Code\\Code.exe'):
+                return 'code'
+            elif os.path.exists('C:\\Program Files\\Sublime Text\\subl.exe'):
+                return 'subl'
+        
+        # Fallback to nano
+        return 'nano'

@@ -12,9 +12,6 @@ class ModifyInit(TutorialBase):
 
     def run(self) -> bool:
         """Run the tutorial"""
-        if not self.verify_file_exists(self.target_file):
-            return False
-
         self.prompter.clear()
         self.prompter.box("Modify __init__.py")
         self.prompter.instruct("\nIn this tutorial, you'll learn how to modify the __init__.py file.")
@@ -25,22 +22,13 @@ class ModifyInit(TutorialBase):
         self.prompter.instruct("if __name__ == \"__main__\":")
         self.prompter.instruct("    main()")
         
+        if not self.verify_file_exists(self.target_file):
+            self.prompter.warn("Did you made the mcp-weather project?. \nDo previous tutorial first")
+            return False
+        
         if not self.handle_editor_options(self.target_file):
             return False
-
-        # Test the command
-        self.prompter.instruct("\nLet's test if the command works:")
-        try:
-            result = subprocess.run(
-                ["python", "-m", "mcp_weather"],
-                cwd="mcp-weather",
-                check=True,
-                text=True,
-                capture_output=True
-            )
-            self.prompter.instruct(result.stdout)
-        except subprocess.CalledProcessError as e:
-            self.prompter.error(f"Error running the command: {e.stderr}")
+        
         return self.check()
 
     def check(self) -> bool:
@@ -48,7 +36,7 @@ class ModifyInit(TutorialBase):
         try:
             # Run the module and capture output
             result = subprocess.run(
-                ["python", "-m", "mcp_weather"],
+                ["hatch", "run", "mcp-weather"],
                 cwd="mcp-weather",
                 check=True,
                 text=True,
@@ -62,5 +50,6 @@ class ModifyInit(TutorialBase):
             # Compare strings ignoring whitespace
             return output == expected
             
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError as e:
+            self.prompter.error(f"Error running the command: {e.stderr}")
             return False 
