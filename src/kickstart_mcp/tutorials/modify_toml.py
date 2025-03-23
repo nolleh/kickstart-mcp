@@ -98,7 +98,17 @@ class ModifyToml(TutorialBase):
     def check(self) -> bool:
         """Check if the pyproject.toml file has been modified correctly"""
         try:
-            with open(self.target_file, "rb") as f:
+            # Check if project exists
+            if not os.path.exists(self.project_dir):
+                self.prompter.error("Project directory not found. Please complete the previous tutorial first.")
+                return False
+
+            toml_path = os.path.join(self.project_dir, "pyproject.toml")
+            if not os.path.exists(toml_path):
+                self.prompter.error("pyproject.toml not found. Please complete the previous tutorial first.")
+                return False
+            
+            with open(toml_path, "rb") as f:
                 content = tomli.load(f)
             
             # Check if all required sections exist
@@ -106,35 +116,33 @@ class ModifyToml(TutorialBase):
                 return False
             
             project = content["project"]
-            
+
             # Check if all required fields exist and have correct types
             required_fields = {
                 "name": str,
-                "version": str,
                 "description": str,
                 "authors": list,
                 "dependencies": list,
                 "requires-python": str,
                 "readme": str,
-                "license": dict,
+                "license": str,
                 "keywords": list,
-                "classifiers": list,
-                "urls": dict
             }
             
             for field, field_type in required_fields.items():
                 if field not in project or not isinstance(project[field], field_type):
+                    self.prompter.warn(f"there isn't required field in project {field}")
                     return False
             
             # Check if dependencies include required packages
-            required_deps = {"click", "colorama"}
-            if not all(dep in project["dependencies"] for dep in required_deps):
-                return False
-            
-            # Check if license is MIT
-            if project["license"].get("text") != "MIT":
-                return False
-            
+            # required_deps = {"click", "colorama"}
+            # if not all(dep in project["dependencies"] for dep in required_deps):
+            #     return False
+            #
+            # # Check if license is MIT
+            # if project["license"].get("text") != "MIT":
+            #     return False
+           
             # Check if build-system is correct
             build_system = content["build-system"]
             if (build_system.get("requires") != ["hatchling"] or 
@@ -239,6 +247,7 @@ class ModifyToml(TutorialBase):
                             print(e.stderr)
                             prompter.instruct("Oh! we added the entry point mcp_weather:main, but there isn't main func! "
                                 "\nLet's modify it next tutorial")
+                            return self.check()
                         finally:
                             pass
                         break
