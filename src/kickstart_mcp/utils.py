@@ -91,20 +91,32 @@ class Prompt:
                 lexer = get_lexer_by_name(language)
                 
                 # Highlight the code
-                text = highlight(text, lexer, TerminalFormatter())
+                highlighted_text = highlight(text, lexer, TerminalFormatter())
                 
-            # Split the highlighted code into lines
-            lines = text.split('\n')
-            # Remove the last empty line if it exists
-            if lines[-1] == '':
-                lines = lines[:-1]
+                # Split the highlighted code into lines
+                lines = highlighted_text.rstrip().split('\n')
+            else:
+                lines = text.rstrip().split('\n')
             
-            # Find the longest line length (excluding ANSI escape codes)
-            max_line_length = max(len(line) for line in lines)
+            # Find the longest line length (excluding ANSI codes)
+            def strip_ansi(s):
+                result = ""
+                i = 0
+                while i < len(s):
+                    if s[i] == '\033':
+                        while i < len(s) and s[i] not in 'm':
+                            i += 1
+                        i += 1  # skip 'm'
+                    else:
+                        result += s[i]
+                        i += 1
+                return result
             
-            # Calculate box width (add 4 for padding)
+            # Calculate max width based on visible characters
+            max_line_length = max(len(strip_ansi(line)) for line in lines)
+            
+            # Calculate box width
             box_width = max_line_length + 4
-            box_width = min(box_width, self.terminal_width - 4)
             
             # Create box parts
             top_line = (self.theme.box_top_left + 
@@ -119,15 +131,9 @@ class Prompt:
             
             # Print each line of code with proper indentation
             for line in lines:
-                # Calculate padding to fill the box width
-                visible_length = len(line) - len(line.split('\033[')[0])  # Remove ANSI codes from length calculation
-                padding = box_width - visible_length - 4
-                # Print the line with box sides
-                print(self.theme.box_vertical + 
-                      " " + 
-                      line + 
-                      " " * padding + 
-                      self.theme.box_vertical)
+                visible_length = len(strip_ansi(line))
+                padding = box_width - visible_length - 2
+                print(f"{self.theme.box_vertical} {line}{' ' * (padding - 1)}{self.theme.box_vertical}")
             
             # Print the box bottom
             print(self.theme.title_color + bottom_line + self.theme.reset)
