@@ -7,7 +7,7 @@ import termios
 from typing import List 
 from .utils import Prompt
 from .state import TutorialState
-from enum import Enum
+import traceback
 
 class Tutorial:
     def __init__(self, name: str, description: str, module: str):
@@ -226,5 +226,5 @@ class Selector:
                     self.select()
 
         except Exception as e:
-            print(f"Error running tutorial {tutorial.name}: {e}")
+            print(f"Error running tutorial {tutorial.name}:", traceback.format_exc())
 

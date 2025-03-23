@@ -5,6 +5,7 @@ import tomli_w
 import subprocess
 import platform
 from colorama import Fore, Style
+from typing import Any
 
 class ModifyToml(TutorialBase):
     def __init__(self):
@@ -189,9 +190,18 @@ class ModifyToml(TutorialBase):
             prompter.error("pyproject.toml not found. Please complete the previous tutorial first.")
             return
 
+        def _open(toml_path, mode: str) -> dict[str, Any] | None:
+            with open(toml_path, mode) as f:
+                try:
+                    toml_data = tomli.load(f)
+                    return toml_data
+                except (tomli.TOMLDecodeError) as e:
+                    prompter.error(f"could not decode as toml, did you write it correctly? {e}")
+                    return None
+
+
         # Read current toml content
-        with open(toml_path, "rb") as f:
-            toml_data = tomli.load(f)
+        _open(toml_path,  "rb")
 
         prompter.instruct("Now we need to add a script entry to your pyproject.toml file.")
         prompter.instruct("Add the following under [project]:")
@@ -226,8 +236,9 @@ class ModifyToml(TutorialBase):
                 
             elif choice == "2":
                 # Read the current state
-                with open(toml_path, "rb") as f:
-                    current_data = tomli.load(f)
+                current_data = _open(toml_path,"rb") 
+                if not current_data:
+                    continue
                 
                 # Check if the script entry exists
                 if "project" in current_data and "scripts" in current_data["project"]:
@@ -269,7 +280,7 @@ class ModifyToml(TutorialBase):
                     "2": "subl",
                     "3": "nano",
                     "4": "vim"
-                }
+                } 
                 
                 if editor_choice in editor_map:
                     self.editor = editor_map[editor_choice]
