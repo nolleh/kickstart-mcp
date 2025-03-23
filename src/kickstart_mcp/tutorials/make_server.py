@@ -81,18 +81,33 @@ server = Server("weather", lifespan=server_lifespan)'''
             self.prompter.clear()
             self.prompter.box("Step 2: Add Run Function and Main")
             self.prompter.instruct("\nIn this step, you'll add the run function and main entry point.")
+            self.prompter.instruct("\nMCP servers can be implemented in two ways:")
+            self.prompter.instruct("1. Local server via standard input/output (stdio)")
+            self.prompter.instruct("   - Direct communication through stdin/stdout")
+            self.prompter.instruct("   - Many MCP Servers are distributed with package that runnable with npx, uv")
+            self.prompter.instruct("   - So, MCP Host often directly run mcp server in local environment")
+            
+            self.prompter.instruct("\n2. HTTP server via Server-Sent Events (SSE)")
+            self.prompter.instruct("   - Web-based communication using SSE")
+            self.prompter.instruct("   - More complex but allows remote connections")
+            self.prompter.intense_instruct("   - Some MCP Host doesn't support this type of connection.")
+            
+            self.prompter.instruct("\nIn this tutorial, we'll implement a stdio server for simplicity.")
+            self.prompter.instruct("The run function will set up the communication channel using stdio_server.")
+            
             self.prompter.instruct("\nAdd the following code to the file:")
             self.prompter.snippet(
                 '''async def run():
     async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
-        await server.run(read_stream, 
-                         write_stream, InitializationOptions(
-                         server_name = "weather",
-                         server_version = "0.1.0",
-                         capabilities = server.get_capabilities(
-                            notification_options=NotificationOptions(),
-                            experimental_capabilities={}
-                         )))
+        print("server is running...")
+        await server.run(read_stream, write_stream, 
+                         InitializationOptions(
+                             server_name = "weather",
+                             server_version = "0.1.0",
+                             capabilities = server.get_capabilities(
+                                notification_options=NotificationOptions(),
+                                experimental_capabilities={}
+                             )))
 
 def main():
     import asyncio
