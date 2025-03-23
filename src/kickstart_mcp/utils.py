@@ -1,3 +1,4 @@
+from io import text_encoding
 from colorama import init, Fore, Style
 import os
 
@@ -7,6 +8,7 @@ class Theme:
         # Colors
         self.title_color = Fore.CYAN + Style.BRIGHT
         self.text_color = Fore.WHITE + Style.NORMAL
+        self.text_color_bright = Fore.WHITE + Style.BRIGHT
         self.intense_text = Fore.MAGENTA
         self.selected_color = Fore.YELLOW + Style.BRIGHT
         self.completed_color = Fore.GREEN
@@ -74,7 +76,8 @@ class Prompt:
     def format_tutorial_item(self, cursor: str, status: str, name: str, description: str, is_selected: bool = False) -> str:
         """Format a tutorial item with proper colors and styling"""
         color = self.theme.selected_color if is_selected else self.theme.text_color
-        status_color = self.theme.completed_color if status == "✓ " else self.theme.text_color
+        status_color = self.theme.completed_color if status == "✓ " else (
+            self.theme.text_color_bright if is_selected else self.theme.text_color)
         return (f"{color}{cursor} {status_color}{status}{name}{self.theme.reset}\n"
                 f"     {self.theme.text_color}{description}{self.theme.reset}")
 

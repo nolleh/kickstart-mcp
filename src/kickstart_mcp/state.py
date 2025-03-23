@@ -41,7 +41,7 @@ class TutorialState:
             "python-project": TutorialGroup(
                 name="Python Project",
                 description="Basic project setup and configuration",
-                tutorials=["MakingProject", "ModifyToml"]
+                tutorials=["MakingProject", "ModifyToml", "ModifyInit"]
             ),
             "mcp-server": TutorialGroup(
                 name="Mcp Server",

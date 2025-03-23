@@ -8,6 +8,9 @@ from typing import List
 from .utils import Prompt
 from .state import TutorialState
 import traceback
+import time
+from .tutorials.modify_toml import ModifyToml
+from .tutorials.modify_init import ModifyInit
 
 class Tutorial:
     def __init__(self, name: str, description: str, module: str):
@@ -52,7 +55,7 @@ class Selector:
                 for name, obj in inspect.getmembers(module):
                     if (inspect.isclass(obj) and 
                         name not in ['Tutorial', 'Selector'] and 
-                        hasattr(obj, 'main')):
+                        hasattr(obj, 'run')):
                         
                         # Get description from docstring or use default
                         description = getattr(obj, '__doc__', '') or f"Tutorial {name}"
@@ -187,8 +190,11 @@ class Selector:
                             tutorial = next((t for t in self.tutorials if t.name == tutorial_name), None)
                             if tutorial:
                                 self.state.set_current_tutorial(tutorial.name)
-                                self._run_tutorial(tutorial)
-                                self.state.mark_tutorial_completed(tutorial.name)
+                                if self._run_tutorial(tutorial):
+                                    self.state.mark_tutorial_completed(tutorial.name)
+                                self.prompter.instruct("➤ Press any key") 
+                                self._get_key()
+                                self.select()
                                 return True
                 elif key == '\x1b':  # Escape sequence
                     next_key = self._get_key()
@@ -218,12 +224,13 @@ class Selector:
             for name, obj in inspect.getmembers(module):
                 if (inspect.isclass(obj) and 
                     name == tutorial.name and 
-                    hasattr(obj, 'main')):
+                    hasattr(obj, 'run')):
                     
                     # Create instance and run main method
                     instance = obj()
-                    instance.main()
-                    self.select()
+                    return instance.run()
+                    # time.sleep(3)
+                    
 
         except Exception as e:
             print(f"Error running tutorial {tutorial.name}:", traceback.format_exc())

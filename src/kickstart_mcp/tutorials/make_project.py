@@ -1,11 +1,13 @@
+import subprocess
 from ..utils import Prompt
+import subprocess
 import os
 
 class MakingProject:
     def __init__(self):
         pass
 
-    def main(self):
+    def run(self) -> bool:
         prompter = Prompt()
         prompter.box("1. Let's make a project")
 
@@ -18,7 +20,16 @@ class MakingProject:
                 break
             prompter.warn("Invalid command. Please try again.")
 
-        os.system("hatch new mcp-weather")
+        try:
+            if self.check():
+                return True
+            subprocess.run(["hatch", "new", "mcp-weather"])
+        except:
+            return False
+        return self.check()
+
+    def check(self) -> bool:
+        return os.path.isdir("mcp-weather")
         
 
 

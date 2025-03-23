@@ -95,28 +95,6 @@ class ModifyToml(TutorialBase):
             return False
         return True
 
-    def run(self) -> bool:
-        """Run the tutorial"""
-        if not self.verify_file_exists(self.target_file):
-            return False
-
-        self.prompter.clear()
-        self.prompter.box("Modify pyproject.toml")
-        self.prompter.instruct("\nIn this tutorial, you'll learn how to modify the pyproject.toml file.")
-        self.prompter.instruct("You'll need to update the project metadata with your information.")
-        self.prompter.instruct("\nAdd the following under [project]:")
-        self.prompter.instruct("[project.scripts]")
-        self.prompter.instruct("mcp-weather = mcp_weather:main")
-        
-        if not self.handle_editor_options(self.target_file):
-            return False
-
-        # Test the command
-        self.prompter.instruct("\nLet's test if the command works:")
-        os.system("cd mcp-weather && hatch run mcp-weather --help")
-
-        return self.check()
-
     def check(self) -> bool:
         """Check if the pyproject.toml file has been modified correctly"""
         try:
@@ -176,19 +154,19 @@ class ModifyToml(TutorialBase):
         except Exception:
             return False
 
-    def main(self):
+    def run(self) -> bool:
         prompter = self.prompter
         prompter.box("2. Let's modify pyproject.toml")
 
         # Check if project exists
         if not os.path.exists(self.project_dir):
             prompter.error("Project directory not found. Please complete the previous tutorial first.")
-            return
+            return False
 
         toml_path = os.path.join(self.project_dir, "pyproject.toml")
         if not os.path.exists(toml_path):
             prompter.error("pyproject.toml not found. Please complete the previous tutorial first.")
-            return
+            return False
 
         def _open(toml_path, mode: str) -> dict[str, Any] | None:
             with open(toml_path, mode) as f:
@@ -201,12 +179,13 @@ class ModifyToml(TutorialBase):
 
 
         # Read current toml content
-        _open(toml_path,  "rb")
+        if not _open(toml_path,  "rb"):
+            return False
 
         prompter.instruct("Now we need to add a script entry to your pyproject.toml file.")
         prompter.instruct("Add the following under [project]:")
         prompter.intense_instruct("[project.scripts]")
-        prompter.intense_instruct("mcp-weather = mcp_weather:main")
+        prompter.intense_instruct('mcp-weather = "mcp_weather:main"')
 
         prompter.instruct("\nThis modification will inform entry point to execute.", Fore.YELLOW + Style.BRIGHT)
         prompter.instruct("The mcp_weather is searched from ./src folder, and then mcp_weather > main ")
@@ -258,7 +237,8 @@ class ModifyToml(TutorialBase):
                             print(result)
                         except subprocess.CalledProcessError as e:
                             print(e.stderr)
-                            prompter.instruct("Oh! we added the entry point mcp_weather:main, but there isn't main func! Let's modify")
+                            prompter.instruct("Oh! we added the entry point mcp_weather:main, but there isn't main func! "
+                                "\nLet's modify it next tutorial")
                         finally:
                             pass
                         break
@@ -294,3 +274,4 @@ class ModifyToml(TutorialBase):
             
             else:
                 prompter.error("Invalid choice. Please try again.") 
+        return self.check()
