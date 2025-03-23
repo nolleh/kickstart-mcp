@@ -1,13 +1,54 @@
-from ..utils import Prompt
+from ..tutorial_base import TutorialBase
 import os
 import tomli
 import tomli_w
 import subprocess
 import platform
 
-class ModifyToml:
-    def __init__(self, name):
-        self.name = name
+class ModifyToml(TutorialBase):
+    def __init__(self):
+        super().__init__(
+            name="Modify pyproject.toml",
+            description="Learn how to modify the pyproject.toml file"
+        )
+        self.target_file = "pyproject.toml"
+        self.expected_content = {
+            "project": {
+                "name": "kickstart-mcp",
+                "version": "0.1.0",
+                "description": "A tutorial for learning MCP",
+                "authors": [
+                    {"name": "Your Name", "email": "your.email@example.com"}
+                ],
+                "dependencies": [
+                    "click",
+                    "colorama"
+                ],
+                "requires-python": ">=3.8",
+                "readme": "README.md",
+                "license": {"text": "MIT"},
+                "keywords": ["tutorial", "mcp", "learning"],
+                "classifiers": [
+                    "Development Status :: 3 - Alpha",
+                    "Intended Audience :: Developers",
+                    "License :: OSI Approved :: MIT License",
+                    "Programming Language :: Python :: 3",
+                    "Programming Language :: Python :: 3.8",
+                    "Programming Language :: Python :: 3.9",
+                    "Programming Language :: Python :: 3.10",
+                    "Programming Language :: Python :: 3.11",
+                    "Topic :: Software Development :: Libraries :: Python Modules",
+                ],
+                "urls": {
+                    "Homepage": "https://github.com/yourusername/kickstart-mcp",
+                    "Bug Tracker": "https://github.com/yourusername/kickstart-mcp/issues",
+                },
+            },
+            "build-system": {
+                "requires": ["hatchling"],
+                "build-backend": "hatchling.build",
+            },
+        }
         self.project_dir = "mcp-weather"
         self.editor = self._get_default_editor()
 
@@ -52,8 +93,89 @@ class ModifyToml:
             return False
         return True
 
+    def run(self) -> bool:
+        """Run the tutorial"""
+        if not self.verify_file_exists(self.target_file):
+            return False
+
+        self.prompter.clear()
+        self.prompter.box("Modify pyproject.toml")
+        self.prompter.instruct("\nIn this tutorial, you'll learn how to modify the pyproject.toml file.")
+        self.prompter.instruct("You'll need to update the project metadata with your information.")
+        self.prompter.instruct("\nAdd the following under [project]:")
+        self.prompter.instruct("[project.scripts]")
+        self.prompter.instruct("mcp-weather = mcp_weather:main")
+        
+        if not self.handle_editor_options(self.target_file):
+            return False
+
+        # Test the command
+        self.prompter.instruct("\nLet's test if the command works:")
+        os.system("cd mcp-weather && hatch run mcp-weather --help")
+
+        return self.check()
+
+    def check(self) -> bool:
+        """Check if the pyproject.toml file has been modified correctly"""
+        try:
+            with open(self.target_file, "rb") as f:
+                content = tomli.load(f)
+            
+            # Check if all required sections exist
+            if "project" not in content or "build-system" not in content:
+                return False
+            
+            project = content["project"]
+            
+            # Check if all required fields exist and have correct types
+            required_fields = {
+                "name": str,
+                "version": str,
+                "description": str,
+                "authors": list,
+                "dependencies": list,
+                "requires-python": str,
+                "readme": str,
+                "license": dict,
+                "keywords": list,
+                "classifiers": list,
+                "urls": dict
+            }
+            
+            for field, field_type in required_fields.items():
+                if field not in project or not isinstance(project[field], field_type):
+                    return False
+            
+            # Check if dependencies include required packages
+            required_deps = {"click", "colorama"}
+            if not all(dep in project["dependencies"] for dep in required_deps):
+                return False
+            
+            # Check if license is MIT
+            if project["license"].get("text") != "MIT":
+                return False
+            
+            # Check if build-system is correct
+            build_system = content["build-system"]
+            if (build_system.get("requires") != ["hatchling"] or 
+                build_system.get("build-backend") != "hatchling.build"):
+                return False
+            
+            # Check if scripts section exists and is correct
+            if "scripts" not in project:
+                return False
+            
+            scripts = project["scripts"]
+            if "mcp-weather" not in scripts or scripts["mcp-weather"] != "mcp_weather:main":
+                return False
+            
+            return True
+            
+        except Exception:
+            return False
+
     def main(self):
-        prompter = Prompt()
+        prompter = self.prompter
         prompter.box("2. Let's modify pyproject.toml")
 
         # Check if project exists

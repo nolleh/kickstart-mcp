@@ -2,8 +2,8 @@ from ..utils import Prompt
 import os
 
 class MakingProject:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
+        pass
 
     def main(self):
         prompter = Prompt()

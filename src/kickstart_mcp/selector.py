@@ -221,7 +221,7 @@ class Selector:
                     hasattr(obj, 'main')):
                     
                     # Create instance and run main method
-                    instance = obj(name=tutorial.name)
+                    instance = obj()
                     instance.main()
                     break
         except Exception as e:
