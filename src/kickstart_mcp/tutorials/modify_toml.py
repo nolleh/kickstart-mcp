@@ -29,6 +29,11 @@ class ModifyToml:
                 return 'code'
             elif os.path.exists('/usr/bin/subl'):  # Sublime Text
                 return 'subl'
+        elif platform.system() == 'Windows':
+            if os.path.exists('C:\\Program Files\\Microsoft VS Code\\Code.exe'):
+                return 'code'
+            elif os.path.exists('C:\\Program Files\\Sublime Text\\subl.exe'):
+                return 'subl'
         
         # Fallback to nano
         return 'nano'
@@ -67,14 +72,14 @@ class ModifyToml:
 
         prompter.instruct("Now we need to add a script entry to your pyproject.toml file.")
         prompter.instruct("Add the following under [project]:")
-        prompter.instruct("[project.scripts]")
-        prompter.instruct("mcp-weather = mcp_weather:main")
+        prompter.intense_instruct("[project.scripts]")
+        prompter.intense_instruct("mcp-weather = mcp_weather:main")
 
         while True:
             # Show current content
             prompter.instruct("\nCurrent pyproject.toml content:")
-            with open(toml_path, "r") as f:
-                prompter.instruct(f.read())
+            # with open(toml_path, "r") as f:
+            #     prompter.instruct(f.read())
 
             # Get user input
             prompter.instruct("\nWould you like to:")

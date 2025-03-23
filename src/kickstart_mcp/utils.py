@@ -1,22 +1,15 @@
 from colorama import init, Fore, Style
-import time
 import os
 
 class Theme:
     def __init__(self):
-        # Box characters (using ASCII characters)
-        self.box_top_left = "+"
-        self.box_top_right = "+"
-        self.box_bottom_left = "+"
-        self.box_bottom_right = "+"
-        self.box_horizontal = "-"
-        self.box_vertical = "|"
         
         # Colors
         self.title_color = Fore.CYAN + Style.BRIGHT
-        self.text_color = Fore.WHITE
-        self.selected_color = Fore.GREEN + Style.BRIGHT
-        self.completed_color = Fore.MAGENTA
+        self.text_color = Fore.WHITE + Style.NORMAL
+        self.intense_text = Fore.MAGENTA
+        self.selected_color = Fore.YELLOW + Style.BRIGHT
+        self.completed_color = Fore.GREEN
         self.progress_color = Fore.BLUE
         self.warning_color = Fore.YELLOW
         self.error_color = Fore.RED
@@ -25,7 +18,8 @@ class Theme:
 
 class Prompt:
     def __init__(self):
-        init()  # Initialize colorama
+        # Initialize colorama with explicit settings
+        init()
         self.theme = Theme()
         self.clear_screen = "\033[2J"  # Clear screen
         self.move_cursor = "\033[H"    # Move cursor to top-left
@@ -45,19 +39,22 @@ class Prompt:
         box_bottom = Fore.CYAN + Style.BRIGHT + "╚" + "═" * box_width + "╝"
         box_side = Fore.CYAN + Style.BRIGHT + "║"
 
-# Center the welcome message
+        # Center the welcome message
         centered_message = text.center(box_width)
 
-# Print the welcome message in a box
+        # Print the welcome message in a box
         print(box_top)
         print(box_side + " " * box_width + box_side)
         print(box_side + centered_message + box_side)
         print(box_side + " " * box_width + box_side)
         print(box_bottom)
 
-    def instruct(self, text: str):
+    def instruct(self, text: str, color: str = Fore.WHITE):
         """Display instruction text"""
-        print(self.theme.text_color + text + self.theme.reset)
+        print(color + text + self.theme.reset)
+    def intense_instruct(self, text: str):
+        """Display intense instruction text"""
+        print(self.theme.intense_text + text + self.theme.reset)
 
     def warn(self, text: str):
         """Display warning text"""
