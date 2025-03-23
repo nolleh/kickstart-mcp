@@ -145,7 +145,38 @@ class Selector:
                 
                 # Get keypress
                 key = self._get_key()
+
+                def move_cursor(key: str | None, direction: str | None):
+                    """Move cursor up or down"""
+                    if direction == 'A' or key == 'k':
+                        if self.current_group: 
+                            group = self.state.groups[self.current_group]
+                            self.current_position = (self.current_position - 1) % len(group.tutorials)
+                    elif direction == 'B' or key == 'j':
+                        if self.current_group:
+                            group = self.state.groups[self.current_group]
+                            self.current_position = (self.current_position + 1) % len(group.tutorials)
+                    elif direction == 'C' or key == 'l':  # Right arrow
+                        # Move to next group
+                        group_names = list(self.state.groups.keys())
+                        if self.current_group:
+                            current_idx = group_names.index(self.current_group)
+                            self.current_group = group_names[(current_idx + 1) % len(group_names)]
+                            self.current_position = 0
+                        else:
+                            self.current_group = group_names[0]
+                    elif direction == 'D' or key == 'h':  # Left arrow
+                        # Move to previous group
+                        group_names = list(self.state.groups.keys())
+                        if self.current_group:
+                            current_idx = group_names.index(self.current_group)
+                            self.current_group = group_names[(current_idx - 1) % len(group_names)]
+                            self.current_position = 0
+                        else:
+                            self.current_group = group_names[-1]
                 
+                move_cursor(key, None)
+
                 if key == 'q':
                     return False
                 elif key == '\r':  # Enter key
@@ -164,33 +195,8 @@ class Selector:
                     if next_key == '[':
                         direction = self._get_key()
                         old_pos = self.current_position
-                        if direction == 'A':  # Up arrow
-                            if self.current_group:
-                                group = self.state.groups[self.current_group]
-                                self.current_position = (self.current_position - 1) % len(group.tutorials)
-                        elif direction == 'B':  # Down arrow
-                            if self.current_group:
-                                group = self.state.groups[self.current_group]
-                                self.current_position = (self.current_position + 1) % len(group.tutorials)
-                        elif direction == 'C':  # Right arrow
-                            # Move to next group
-                            group_names = list(self.state.groups.keys())
-                            if self.current_group:
-                                current_idx = group_names.index(self.current_group)
-                                self.current_group = group_names[(current_idx + 1) % len(group_names)]
-                                self.current_position = 0
-                            else:
-                                self.current_group = group_names[0]
-                        elif direction == 'D':  # Left arrow
-                            # Move to previous group
-                            group_names = list(self.state.groups.keys())
-                            if self.current_group:
-                                current_idx = group_names.index(self.current_group)
-                                self.current_group = group_names[(current_idx - 1) % len(group_names)]
-                                self.current_position = 0
-                            else:
-                                self.current_group = group_names[-1]
-                        
+                        move_cursor(None, direction)
+
                         # Animate selection change
                         self._animate_selection_change(old_pos, self.current_position)
                 
