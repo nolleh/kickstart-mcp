@@ -34,8 +34,8 @@ class MakeServer(TutorialBase):
         elif self.current_step == 3:
             # Check if tools are added
             # content = self.read_target_file()
-            return "@server.list_tools() async def list_tools() -> list[Tool]" in content
-        return False
+            return "@server.list_tools()" in content and "async def list_tools() -> list[Tool]" in content
+        return self.current_step > self.total_steps
 
     def run_step(self, step_id: int) -> bool:
         """Run a specific step of the tutorial"""
@@ -202,4 +202,4 @@ async def list_tools() -> list[Tool]:
                 self.prompter.get_key()
                 self.current_step += 1
 
-        return self.current_step == self.total_steps
+        return self.check() 
