@@ -1,21 +1,20 @@
 # SPDX-FileCopyrightText: 2025-present nolleh <nolleh7707@gmail.com>
 #
 # SPDX-License-Identifier: MIT
-
+# https://wikidocs.net/book/17027
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 from mcp.server import Server
+from mcp.server.lowlevel.server import NotificationOptions, Server
+from mcp.types import TextContent, Tool
+from typing import Sequence
 import mcp.server.stdio
 from mcp.server.models import InitializationOptions
-from mcp.server.lowlevel.server import NotificationOptions
-from mcp.types import Tool
 
 
 @asynccontextmanager
 async def server_lifespan(server: Server) -> AsyncIterator[str]:
     try:
-        ## this is just example. actually code,
-        ## use yield with consuming resource, like db connection
         yield server.name
     finally:
         pass
@@ -43,6 +42,11 @@ async def list_tools() -> list[Tool]:
             ]
         )
     return tools
+
+
+@server.call_tool()
+async def get_weather(name: str, state: str) -> Sequence[TextContent]:
+    return [TextContent(type="text", text=f"Hello {state}")]
 
 
 async def run():
