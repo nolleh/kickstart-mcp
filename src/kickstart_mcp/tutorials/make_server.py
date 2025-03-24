@@ -11,7 +11,7 @@ class MakeServer(TutorialBase):
         )
         self.target_file = "mcp-weather/src/mcp_weather/__init__.py"
         self.current_step = 1
-        self.total_steps = 3  # Updated to include the new tool step
+        self.total_steps = 4  # Updated to include the new call_tool step
 
     def check(self) -> bool:
         """Check if a specific step is completed"""
@@ -35,19 +35,21 @@ class MakeServer(TutorialBase):
             # Check if tools are added
             # content = self.read_target_file()
             return "@server.list_tools()" in content and "async def list_tools() -> list[Tool]" in content
+        elif self.current_step == 4:
+            return "@server.call_tool()" in content and "async def get_weather" in content
         return self.current_step > self.total_steps
 
     def run_step(self, step_id: int) -> bool:
         """Run a specific step of the tutorial"""
         if step_id == 1:
             self.step1()
-            self.handle_editor_options(self.target_file)
         elif step_id == 2:
             self.step2()
-            self.handle_editor_options(self.target_file)
         elif step_id == 3:
-        ##  run is checking self.check() after finish this function 
-            self.handle_editor_options(self.target_file)
+            self.step3()
+        elif step_id == 4:
+            self.step4()
+        self.handle_editor_options(self.target_file)
         return True
 
     def step1(self):
@@ -76,9 +78,6 @@ class MakeServer(TutorialBase):
             '''from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 from mcp.server import Server
-from mcp.server.stdio import stdio_server
-from mcp.server.stdio.stdio_server import InitializationOptions
-from mcp.server.stdio.stdio_server import NotificationOptions
 
 @asynccontextmanager
 async def server_lifespan(server: Server) -> AsyncIterator[str]:
@@ -113,7 +112,10 @@ server = Server("weather", lifespan=server_lifespan)'''
         
         self.prompter.instruct("\nAdd the following code to the file:")
         self.prompter.snippet(
-            '''from mcp.server.stdio
+            '''import mcp.server.stdio
+from mcp.server.models import InitializationOptions
+from mcp.server.lowlevel.server import NotificationOptions
+
 async def run():
     async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
         print("server is running...")
@@ -177,7 +179,9 @@ asyncio.run(run())'''
         
         self.prompter.instruct("\nAdd the following code to the file:")
         self.prompter.snippet(
-            '''@server.list_tools()
+            '''from mcp.types import Tool
+
+@server.list_tools()
 async def list_tools() -> list[Tool]:
 tools = []
 ctx = server.request_context.lifespan_context
@@ -197,6 +201,51 @@ if ctx and "weather":
     )
 return tools''')
 
+    def step4(self):
+        self.prompter.clear()
+        self.prompter.box("Step 4: Implement Tool Handler")
+        self.prompter.instruct("\nNow we'll implement the tool handler using ModelContextProtocol's call_tool.")
+        self.prompter.instruct("The tool handler is called based on the tool information received through list_tools.")
+        
+        self.prompter.instruct("\nTool Call Request Format:")
+        self.prompter.snippet(
+            '''{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/call",
+  "params": {
+    "name": "example_tool",
+    "arguments": {
+      "param": "value"
+    }
+  }
+}'''
+        )
+        
+        self.prompter.instruct("\nTool Call Response Format:")
+        self.prompter.snippet(
+            '''{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "content": [{
+      "type": "text",
+      "text": "Tool execution result"
+    }],
+    "isError": false
+  }
+}'''
+        )
+        
+        self.prompter.instruct("\nAdd the following code to the file:")
+        self.prompter.snippet(
+            '''from mcp.types import Tool, TextContent 
+from typing import Sequence
+
+@server.call_tool()
+async def get_weather(name: str, state: str) -> Sequence[TextContent]:
+    return [TextContent(type="text", text=f"Hello {state}")]'''
+        )
 
     def run(self) -> bool:
         """Run the tutorial"""
