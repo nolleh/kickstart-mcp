@@ -20,8 +20,8 @@ class ImplementWeather(TutorialBase):
             return False
 
         content = Path(self.target_file).read_text()
-        self.prompter.intense_instruct("read file..")
-        self.prompter.snippet(content)
+        # self.prompter.intense_instruct("read file..")
+        # self.prompter.snippet(content)
 
         if self.current_step == 1:
             return "NWS_API_BASE" in content and "make_nws_request" in content

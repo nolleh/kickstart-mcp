@@ -20,8 +20,8 @@ class MakeServer(TutorialBase):
             return False
 
         content = Path(self.target_file).read_text()
-        self.prompter.intense_instruct("read file..")
-        self.prompter.snippet(content)
+        # self.prompter.intense_instruct("read file..")
+        # self.prompter.snippet(content)
 
         if self.current_step == 1:
             # Check if server instance is created

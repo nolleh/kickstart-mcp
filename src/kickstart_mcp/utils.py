@@ -149,7 +149,7 @@ class Prompt:
         except Exception as e:
             # Fallback to non-highlighted version if highlighting fails
             print(f"Warning: Syntax highlighting failed: {e}")
-            self.snippet(text, language=None)
+            # self.snippet(text, language=None)
 
     def format_tutorial_item(self, cursor: str, status: str, name: str, description: str, is_selected: bool = False) -> str:
         """Format a tutorial item with proper colors and styling"""
