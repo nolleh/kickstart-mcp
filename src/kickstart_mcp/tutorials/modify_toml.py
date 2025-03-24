@@ -107,6 +107,9 @@ class ModifyToml(TutorialBase):
                     self.prompter.warn(f"there isn't required field in project {field}")
                     return False
             
+            if project.get("requires-python") != ">=3.10":
+                return False
+
             # Check if dependencies include required packages
             # required_deps = {"click", "colorama"}
             # if not all(dep in project["dependencies"] for dep in required_deps):
@@ -163,13 +166,18 @@ class ModifyToml(TutorialBase):
         if not _open(toml_path,  "rb"):
             return False
 
-        prompter.instruct("Now we need to add a script entry to your pyproject.toml file.")
+        prompter.instruct("Now We need to use mcp library and it requires python 3.10, so update minimum python version.")
+        prompter.instruct("Modify requires_python")
+        prompter.snippet('''requires-python = ">=3.10"''')
+
+        prompter.instruct("Also, we need to add a script entry to your pyproject.toml file.")
         prompter.instruct("Add the following under [project]:")
         snippet = '''
 [project.scripts]
 'mcp-weather = "mcp_weather:main"')
 '''
         prompter.snippet(snippet)
+
 
         prompter.instruct("\nThis modification will inform entry point to execute.", Fore.YELLOW + Style.BRIGHT)
         prompter.instruct("The mcp_weather is searched from ./src folder, and then mcp_weather > main ")

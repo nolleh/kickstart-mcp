@@ -40,29 +40,40 @@ class MakeServer(TutorialBase):
     def run_step(self, step_id: int) -> bool:
         """Run a specific step of the tutorial"""
         if step_id == 1:
-            self.prompter.clear()
-            self.prompter.box("Step 1: Create Server Instance")
-            self.prompter.instruct("\nIn this step, you'll create a server instance with a lifespan manager.")
-            self.prompter.instruct("\nLet's break down what each part does:")
-            self.prompter.instruct("\n1. @asynccontextmanager decorator:")
-            self.prompter.instruct("   - This decorator helps manage the server's lifecycle")
-            self.prompter.instruct("   - It ensures proper setup and cleanup of server resources")
-            self.prompter.instruct("   - Similar to a context manager (with statement) but for async code")
-            
-            self.prompter.instruct("\n2. server_lifespan function:")
-            self.prompter.instruct("   - Manages the server's lifecycle events")
-            self.prompter.instruct("   - yield server.name: Provides context (in here, server.name) during its active lifetime")
-            self.prompter.intense_instruct("   - This context can be retrieved by accessing server.request_context")
-            self.prompter.instruct("   - The finally block: Place for cleanup code when server shuts down")
-            
-            self.prompter.instruct("\n3. Server instance creation:")
-            self.prompter.instruct("   - Creates a new mcp.server named 'weather'")
-            self.prompter.instruct("   - Attaches the lifespan manager to handle lifecycle events")
-            
-            
-            self.prompter.instruct("\nAdd the following code to the file:")
-            self.prompter.snippet(
-                '''from contextlib import asynccontextmanager
+            self.step1()
+            self.handle_editor_options(self.target_file)
+        elif step_id == 2:
+            self.step2()
+            self.handle_editor_options(self.target_file)
+        elif step_id == 3:
+        ##  run is checking self.check() after finish this function 
+            self.handle_editor_options(self.target_file)
+        return True
+
+    def step1(self):
+        self.prompter.clear()
+        self.prompter.box("Step 1: Create Server Instance")
+        self.prompter.instruct("\nIn this step, you'll create a server instance with a lifespan manager.")
+        self.prompter.instruct("\nLet's break down what each part does:")
+        self.prompter.instruct("\n1. @asynccontextmanager decorator:")
+        self.prompter.instruct("   - This decorator helps manage the server's lifecycle")
+        self.prompter.instruct("   - It ensures proper setup and cleanup of server resources")
+        self.prompter.instruct("   - Similar to a context manager (with statement) but for async code")
+        
+        self.prompter.instruct("\n2. server_lifespan function:")
+        self.prompter.instruct("   - Manages the server's lifecycle events")
+        self.prompter.instruct("   - yield server.name: Provides context (in here, server.name) during its active lifetime")
+        self.prompter.intense_instruct("   - This context can be retrieved by accessing server.request_context")
+        self.prompter.instruct("   - The finally block: Place for cleanup code when server shuts down")
+        
+        self.prompter.instruct("\n3. Server instance creation:")
+        self.prompter.instruct("   - Creates a new mcp.server named 'weather'")
+        self.prompter.instruct("   - Attaches the lifespan manager to handle lifecycle events")
+        
+        
+        self.prompter.instruct("\nAdd the following code to the file:")
+        self.prompter.snippet(
+            '''from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
@@ -71,38 +82,39 @@ from mcp.server.stdio.stdio_server import NotificationOptions
 
 @asynccontextmanager
 async def server_lifespan(server: Server) -> AsyncIterator[str]:
-    try:
-        ## This is just example. actual code, 
-        ## Using yield with time consuming resource, like db connection 
-        yield server.name
-    finally:
-        pass
+try:
+    ## This is just example. actual code, 
+    ## Using yield with time consuming resource, like db connection 
+    yield server.name
+finally:
+    pass
 
 server = Server("weather", lifespan=server_lifespan)'''
-            )
-            self.prompter.instruct("You also need to add dependency in project.toml file")
-            self.handle_editor_options(self.target_file)
-        elif step_id == 2:
-            self.prompter.clear()
-            self.prompter.box("Step 2: Add Run Function and Main")
-            self.prompter.instruct("\nIn this step, you'll add the run function and main entry point.")
-            self.prompter.instruct("\nMCP servers can be implemented in two ways:")
-            self.prompter.instruct("1. Local server via standard input/output (stdio)")
-            self.prompter.instruct("   - Direct communication through stdin/stdout")
-            self.prompter.instruct("   - Many MCP Servers are distributed with package that runnable with npx, uv")
-            self.prompter.instruct("   - So, MCP Host often directly run mcp server in local environment")
-            
-            self.prompter.instruct("\n2. HTTP server via Server-Sent Events (SSE)")
-            self.prompter.instruct("   - Web-based communication using SSE")
-            self.prompter.instruct("   - More complex but allows remote connections")
-            self.prompter.intense_instruct("   - Some MCP Host doesn't support this type of connection.")
+        )
+        self.prompter.instruct("You also need to add dependency in project.toml file")
 
-            self.prompter.instruct("\nIn this tutorial, we'll implement a stdio server for simplicity.")
-            self.prompter.instruct("The run function will set up the communication channel using stdio_server.")
-            
-            self.prompter.instruct("\nAdd the following code to the file:")
-            self.prompter.snippet(
-                '''async def run():
+    def step2(self):
+        self.prompter.clear()
+        self.prompter.box("Step 2: Add Run Function and Main")
+        self.prompter.instruct("\nIn this step, you'll add the run function and main entry point.")
+        self.prompter.instruct("\nMCP servers can be implemented in two ways:")
+        self.prompter.instruct("1. Local server via standard input/output (stdio)")
+        self.prompter.instruct("   - Direct communication through stdin/stdout")
+        self.prompter.instruct("   - Many MCP Servers are distributed with package that runnable with npx, uv")
+        self.prompter.instruct("   - So, MCP Host often directly run mcp server in local environment")
+        
+        self.prompter.instruct("\n2. HTTP server via Server-Sent Events (SSE)")
+        self.prompter.instruct("   - Web-based communication using SSE")
+        self.prompter.instruct("   - More complex but allows remote connections")
+        self.prompter.intense_instruct("   - Some MCP Host doesn't support this type of connection.")
+
+        self.prompter.instruct("\nIn this tutorial, we'll implement a stdio server for simplicity.")
+        self.prompter.instruct("The run function will set up the communication channel using stdio_server.")
+        
+        self.prompter.instruct("\nAdd the following code to the file:")
+        self.prompter.snippet(
+            '''from mcp.server.stdio
+async def run():
     async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
         print("server is running...")
         await server.run(
@@ -119,75 +131,72 @@ server = Server("weather", lifespan=server_lifespan)'''
         )
 
 def main():
-    import asyncio
-    asyncio.run(run())'''
-            )
-            self.prompter.instruct("You also need to add dependency in project.toml file")
-            self.handle_editor_options(self.target_file)
-        elif step_id == 3:
-            self.prompter.clear()
-            self.prompter.box("Step 3: Add Tools")
-            self.prompter.instruct("\nTools are one of the core features of Model Context Protocol (MCP).")
-            self.prompter.instruct("They enable AI models to interact with external systems and perform actual tasks.")
-            
-            self.prompter.instruct("\nKey points about Tools:")
-            self.prompter.instruct("1. Model-centric control:")
-            self.prompter.instruct("   - Designed for model-centric control")
-            self.prompter.instruct("   - AI models can understand context and automatically find and call tools")
-            
-            self.prompter.instruct("\n2. Safety and reliability:")
-            self.prompter.instruct("   - User approval is always required for actual tool execution")
-            self.prompter.instruct("   - Ensures safe and controlled interaction with external systems")
-            
-            self.prompter.instruct("\n3. Input Schema:")
-            self.prompter.instruct("   - Defines the structure of input parameters for each tool")
-            self.prompter.instruct("   - Uses JSON Schema format to specify:")
-            self.prompter.instruct("     * Parameter types")
-            self.prompter.instruct("     * Parameter descriptions")
-            self.prompter.instruct("     * Required parameters")
-
-            self.prompter.instruct("\nTools structure")
-            self.prompter.snippet(
-                '''{
-  "name": "tool_name",
-  "description": "tool_description",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "paramter name": {
-        "type": "string",
-        "description": "parmeter description"
-      }
-    },
-    "required": ["required_parameter_list"]
-  }
-}''')
-            
-            self.prompter.instruct("\nAdd the following code to the file:")
-            self.prompter.snippet(
-                '''@server.list_tools()
-async def list_tools() -> list[Tool]:
-    tools = []
-    ctx = server.request_context.lifespan_context
-
-    if ctx and "weather":
-        tools.extend(
-            [
-                Tool(
-                    name="get_weather",
-                    description="Get the weather",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {"state": {"type": "string"}},
-                    },
-                )
-            ]
+import asyncio
+asyncio.run(run())'''
         )
-    return tools'''
+        self.prompter.instruct("You also need to add dependency in project.toml file")
+
+    def step3(self):
+        self.prompter.clear()
+        self.prompter.box("Step 3: Add Tools")
+        self.prompter.instruct("\nTools are one of the core features of Model Context Protocol (MCP).")
+        self.prompter.instruct("They enable AI models to interact with external systems and perform actual tasks.")
+        
+        self.prompter.instruct("\nKey points about Tools:")
+        self.prompter.instruct("1. Model-centric control:")
+        self.prompter.instruct("   - Designed for model-centric control")
+        self.prompter.instruct("   - AI models can understand context and automatically find and call tools")
+        
+        self.prompter.instruct("\n2. Safety and reliability:")
+        self.prompter.instruct("   - User approval is always required for actual tool execution")
+        self.prompter.instruct("   - Ensures safe and controlled interaction with external systems")
+        
+        self.prompter.instruct("\n3. Input Schema:")
+        self.prompter.instruct("   - Defines the structure of input parameters for each tool")
+        self.prompter.instruct("   - Uses JSON Schema format to specify:")
+        self.prompter.instruct("     * Parameter types")
+        self.prompter.instruct("     * Parameter descriptions")
+        self.prompter.instruct("     * Required parameters")
+
+        self.prompter.instruct("\nTools structure")
+        self.prompter.snippet(
+            '''{
+"name": "tool_name",
+"description": "tool_description",
+"inputSchema": {
+"type": "object",
+"properties": {
+  "paramter name": {
+    "type": "string",
+    "description": "parmeter description"
+  }
+},
+"required": ["required_parameter_list"]
+}
+}''')
+        
+        self.prompter.instruct("\nAdd the following code to the file:")
+        self.prompter.snippet(
+            '''@server.list_tools()
+async def list_tools() -> list[Tool]:
+tools = []
+ctx = server.request_context.lifespan_context
+
+if ctx and "weather":
+    tools.extend(
+        [
+            Tool(
+                name="get_weather",
+                description="Get the weather",
+                inputSchema={
+                    "type": "object",
+                    "properties": {"state": {"type": "string"}},
+                },
             )
-            self.handle_editor_options(self.target_file)
-        ##  run is checking self.check() after finish this function 
-        return True
+        ]
+    )
+return tools''')
+
 
     def run(self) -> bool:
         """Run the tutorial"""
