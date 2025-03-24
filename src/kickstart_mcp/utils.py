@@ -103,6 +103,7 @@ class Prompt:
             
             # Find the longest line length (excluding ANSI codes)
             def strip_ansi(s):
+                import unicodedata
                 result = ""
                 i = 0
                 while i < len(s):
@@ -111,7 +112,11 @@ class Prompt:
                             i += 1
                         i += 1  # skip 'm'
                     else:
-                        result += s[i]
+                        char = s[i]
+                        # Calculate the display width of the character
+                        # East Asian width characters and emojis typically have width 2
+                        width = 2 if unicodedata.east_asian_width(char) in ('F', 'W') or ord(char) > 0x1F000 else 1
+                        result += ' ' * width
                         i += 1
                 return result
             

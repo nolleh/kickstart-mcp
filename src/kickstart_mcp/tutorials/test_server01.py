@@ -1,7 +1,4 @@
-from typing import Optional
 from ..tutorial_base import TutorialBase
-from ..utils import Prompt
-from pathlib import Path
 
 class TestServer01(TutorialBase):
     def __init__(self):
@@ -29,7 +26,8 @@ class TestServer01(TutorialBase):
             self.prompter.instruct("\nPlease follow the instructions to perform the test yourself.")
             
             self.prompter.snippet(
-                '''npx @model_context_protocol/inspector
+                '''$ npx @model_context_protocol/inspector''')
+            self.prompter.snippet('''
 Starting MCP inspector...
 Proxy server listening on port 3000
 
