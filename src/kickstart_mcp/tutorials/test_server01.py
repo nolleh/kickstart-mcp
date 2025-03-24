@@ -1,4 +1,5 @@
 from ..tutorial_base import TutorialBase
+import os
 
 class TestServer01(TutorialBase):
     def __init__(self):
@@ -42,12 +43,12 @@ Proxy server listening on port 3000
             self.prompter.instruct("\nAfter performing the test,")
             self.prompter.instruct("please refer to the following document.")
             
-            self.prompter.instruct("\n➤ Press any key to open the reference document")
+            self.prompter.instruct("\n➤ Press any key to open the reference document\n(open with system default application)")
             self.prompter.get_key()
             
             # Open the reference document
             # self.open_reference_document("test_server01.md")
-            
+            os.system("open ./tutorial/description/test_server01.md")
             return True
         return False
 
