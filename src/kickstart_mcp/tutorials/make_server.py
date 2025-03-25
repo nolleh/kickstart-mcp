@@ -163,18 +163,18 @@ asyncio.run(run())'''
         self.prompter.instruct("\nTools structure")
         self.prompter.snippet(
             '''{
-"name": "tool_name",
-"description": "tool_description",
-"inputSchema": {
-"type": "object",
-"properties": {
-  "paramter name": {
-    "type": "string",
-    "description": "parmeter description"
-  }
-},
-"required": ["required_parameter_list"]
-}
+    "name": "tool_name",
+    "description": "tool_description",
+    "inputSchema": {
+    "type": "object",
+    "properties": {
+      "paramter name": {
+        "type": "string",
+        "description": "parmeter description"
+      }
+    },
+    "required": ["required_parameter_list"]
+    }
 }''')
         
         self.prompter.instruct("\nAdd the following code to the file:")
@@ -183,23 +183,23 @@ asyncio.run(run())'''
 
 @server.list_tools()
 async def list_tools() -> list[Tool]:
-tools = []
-ctx = server.request_context.lifespan_context
+    tools = []
+    ctx = server.request_context.lifespan_context
 
-if ctx and "weather":
-    tools.extend(
-        [
-            Tool(
-                name="get_weather",
-                description="Get the weather",
-                inputSchema={
-                    "type": "object",
-                    "properties": {"state": {"type": "string"}},
-                },
-            )
-        ]
-    )
-return tools''')
+    if ctx and "weather":
+        tools.extend(
+            [
+                Tool(
+                    name="get_weather",
+                    description="Get the weather",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {"state": {"type": "string"}},
+                    },
+                )
+            ]
+        )
+    return tools''')
 
     def step4(self):
         self.prompter.clear()

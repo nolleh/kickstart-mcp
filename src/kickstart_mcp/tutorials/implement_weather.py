@@ -98,10 +98,10 @@ Instructions: {props.get('instruction', 'No specific instructions provided')}
         self.prompter.clear()
         self.prompter.box("Step 2: Implement Weather Alerts Tool")
         self.prompter.instruct("\nNow we'll modify the list_tools and implement get_alerts functionality.")
+        self.prompter.instruct("This will allow users to get weather alerts for any US state.")
         self.prompter.intense_instruct("\nThe get_weather function from the previous tutorial is not very useful, so we'll remove it.")
-        self.prompter.instruct("\nThis will allow users to get weather alerts for any US state.")
 
-        self.prompter.intense_instruct("\nWe'll also implement the call_tool function to determine which tool should be called.")
+        self.prompter.intense_instruct("We'll also modify the call_tool function to determine which tool should be called.")
         
         self.prompter.instruct("\nReplace your existing list_tools with:")
         self.prompter.snippet(
@@ -127,16 +127,15 @@ async def list_tools() -> list[Tool]:
                 }
             ),
         ])
-    return tools
+    return tools''')
 
+        self.prompter.instruct("\nAnd also, replace your existing call_tool, and add get_alerts with:")
+        self.prompter.snippet('''
 @server.call_tool()
 async def call_tool(name: str, arguments: dict) -> Sequence[TextContent]:
     # return [TextContent(type="text", text="test~")]
     if name == "get_alerts":
         result = await get_alerts(arguments["state"])
-        return [TextContent(type="text", text=result)]
-    elif name == "get_forecast":
-        result = await get_forecast(arguments["latitude"], arguments["longitude"])
         return [TextContent(type="text", text=result)]
     raise ValueError(f"Unknown tool: {name}")
 
@@ -157,7 +156,7 @@ async def get_alerts(state: str) -> str:
         return "No active alerts for this state."
 
     alerts = [format_alert(feature) for feature in data["features"]]
-    return "\n--\n".join(alerts)'''
+    return "\\n--\\n".join(alerts)'''
         )
 
     def step3(self):
@@ -169,25 +168,25 @@ async def get_alerts(state: str) -> str:
         self.prompter.instruct("\nAdd this to your list_tools function (inside tools.extend):")
         self.prompter.snippet(
             ''' 
-                Tool(
-                    name="get_forecast",
-                    description="Get weather forecast for a location",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "latitude": {
-                                "type": "number",
-                                "description": "Latitude of the location. ex. 38.8898",
-                            },
-                            "longitude": {
-                                "type": "number",
-                                "description": "Longitude of the location. ex. -77.009056",
-                            },
+            Tool(
+                name="get_forecast",
+                description="Get weather forecast for a location",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "latitude": {
+                            "type": "number",
+                            "description": "Latitude of the location. ex. 38.8898",
                         },
-                        "required": ["latitude", "longitude"],
+                        "longitude": {
+                            "type": "number",
+                            "description": "Longitude of the location. ex. -77.009056",
+                        },
                     },
-                ),
-            )'''
+                    "required": ["latitude", "longitude"],
+                },
+            ),
+            '''
         )
         
         self.prompter.instruct("\nAnd add this new tool implementation:")
@@ -235,7 +234,7 @@ Wind: {period['windSpeed']} {period['windDirection']}
 Forecast: {period['detailedForecast']}
         """
         forecasts.append(forecast)
-    return "\n--\n".join(forecasts)'''
+    return "\\n--\\n".join(forecasts)'''
         )
 
     def run(self) -> bool:

@@ -55,5 +55,4 @@ if __name__ == "__main__":
             return output == expected
             
         except subprocess.CalledProcessError as e:
-            self.prompter.error(f"Error running the command: {e.stderr}")
             return False 
