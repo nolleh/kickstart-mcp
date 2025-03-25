@@ -45,6 +45,8 @@ class ImplementWeather(TutorialBase):
     def step1(self):
         self.prompter.clear()
         self.prompter.box("Step 1: Add Helper Functions")
+        self.prompter.intense_instruct("The previous server is working, but it's not very useful.")
+        self.prompter.intense_instruct("Let's make it more practical.")
         self.prompter.instruct("\nFirst, we'll add helper functions to interact with the National Weather Service API.")
         self.prompter.instruct("These functions will help us make HTTP requests and format the responses.")
         
@@ -96,7 +98,10 @@ Instructions: {props.get('instruction', 'No specific instructions provided')}
         self.prompter.clear()
         self.prompter.box("Step 2: Implement Weather Alerts Tool")
         self.prompter.instruct("\nNow we'll modify the list_tools and implement get_alerts functionality.")
-        self.prompter.instruct("This will allow users to get weather alerts for any US state.")
+        self.prompter.intense_instruct("\nThe get_weather function from the previous tutorial is not very useful, so we'll remove it.")
+        self.prompter.instruct("\nThis will allow users to get weather alerts for any US state.")
+
+        self.prompter.intense_instruct("\nWe'll also implement the call_tool function to determine which tool should be called.")
         
         self.prompter.instruct("\nReplace your existing list_tools with:")
         self.prompter.snippet(
@@ -125,23 +130,34 @@ async def list_tools() -> list[Tool]:
     return tools
 
 @server.call_tool()
-async def get_alerts(name: str, state: str) -> Sequence[TextContent]:
-    """Get weather alerts for a US state.
-    
+async def call_tool(name: str, arguments: dict) -> Sequence[TextContent]:
+    # return [TextContent(type="text", text="test~")]
+    if name == "get_alerts":
+        result = await get_alerts(arguments["state"])
+        return [TextContent(type="text", text=result)]
+    elif name == "get_forecast":
+        result = await get_forecast(arguments["latitude"], arguments["longitude"])
+        return [TextContent(type="text", text=result)]
+    raise ValueError(f"Unknown tool: {name}")
+
+async def get_alerts(state: str) -> str:
+    """Get weather alerts for a US state
+
     Args:
         state: Two-letter US state code (e.g. CA, NY)
     """
+
     url = f"{NWS_API_BASE}/alerts/active/area/{state}"
     data = await make_nws_request(url)
 
     if not data or "features" not in data:
-        return [TextContent(type="text", text="Unable to fetch alerts or no alerts found.")]
+        return f"url: {url}, Unable to fetch alerts or no alerts found."
 
     if not data["features"]:
-        return [TextContent(type="text", text="No active alerts for this state.")]
+        return "No active alerts for this state."
 
     alerts = [format_alert(feature) for feature in data["features"]]
-    return [TextContent(type="text", text="\\n---\\n".join(alerts))]'''
+    return "\n--\n".join(alerts)'''
         )
 
     def step3(self):
@@ -152,66 +168,74 @@ async def get_alerts(name: str, state: str) -> Sequence[TextContent]:
         
         self.prompter.instruct("\nAdd this to your list_tools function (inside tools.extend):")
         self.prompter.snippet(
-            '''            Tool(
-                name="get_forecast",
-                description="Get weather forecast for a location",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "latitude": {
-                            "type": "number",
-                            "description": "Latitude of the location"
+            ''' 
+                Tool(
+                    name="get_forecast",
+                    description="Get weather forecast for a location",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "latitude": {
+                                "type": "number",
+                                "description": "Latitude of the location. ex. 38.8898",
+                            },
+                            "longitude": {
+                                "type": "number",
+                                "description": "Longitude of the location. ex. -77.009056",
+                            },
                         },
-                        "longitude": {
-                            "type": "number",
-                            "description": "Longitude of the location"
-                        }
+                        "required": ["latitude", "longitude"],
                     },
-                    "required": ["latitude", "longitude"]
-                }
+                ),
             )'''
         )
         
         self.prompter.instruct("\nAnd add this new tool implementation:")
         self.prompter.snippet(
-            '''@server.call_tool()
-async def get_forecast(name: str, arguments: dict) -> Sequence[TextContent]:
-    """Get weather forecast for a location.
-    
-    Args:
-        argument[latitude]: Latitude of the location. ex. 38.8894
-        argument[longitude]: Longitude of the location ex. -77.0352
-    """
-    latitude = arguments[latitude]
-    longitude = arguments[longitude]
+            '''
+@server.call_tool()
+async def call_tool(name: str, arguments: dict) -> Sequence[TextContent]:
+    ## ....previous steps code
+    elif name == "get_forecast":
+        result = await get_forecast(arguments["latitude"], arguments["longitude"])
+        return [TextContent(type="text", text=result)]
+    raise ValueError(f"Unknown tool: {name}")
 
-    # First get the forecast grid endpoint
+async def get_forecast(latitude: float, longitude: float) -> str:
+    """Get weather forecast for a location.
+
+    Args:
+        latitude: Latitude of the location
+        longitude: Longitude of the location
+    """
+
+    # First get the Forecast grid endpoint
     points_url = f"{NWS_API_BASE}/points/{latitude},{longitude}"
     points_data = await make_nws_request(points_url)
 
     if not points_data:
-        return [TextContent(type="text", text="Unable to fetch forecast data for this location.")]
+        return "Unable to fetch forecast data for this location."
 
     # Get the forecast URL from the points response
     forecast_url = points_data["properties"]["forecast"]
     forecast_data = await make_nws_request(forecast_url)
 
     if not forecast_data:
-        return [TextContent(type="text", text="Unable to fetch detailed forecast.")]
+        return "Unable to fetch detailed forecast."
 
     # Format the periods into a readable forecast
     periods = forecast_data["properties"]["periods"]
     forecasts = []
-    for period in periods[:5]:  # Only show next 5 periods
+
+    for period in periods[:5]:  # Only show next 5 period
         forecast = f"""
 {period['name']}:
 Temperature: {period['temperature']}°{period['temperatureUnit']}
 Wind: {period['windSpeed']} {period['windDirection']}
 Forecast: {period['detailedForecast']}
-"""
+        """
         forecasts.append(forecast)
-
-    return [TextContent(type="text", text="\\n---\\n".join(forecasts))]'''
+    return "\n--\n".join(forecasts)'''
         )
 
     def run(self) -> bool:
