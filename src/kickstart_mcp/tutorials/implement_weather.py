@@ -175,13 +175,16 @@ async def get_alerts(name: str, state: str) -> Sequence[TextContent]:
         self.prompter.instruct("\nAnd add this new tool implementation:")
         self.prompter.snippet(
             '''@server.call_tool()
-async def get_forecast(name: str, latitude: float, longitude: float) -> Sequence[TextContent]:
+async def get_forecast(name: str, arguments: dict) -> Sequence[TextContent]:
     """Get weather forecast for a location.
     
     Args:
-        latitude: Latitude of the location
-        longitude: Longitude of the location
+        argument[latitude]: Latitude of the location. ex. 38.8894
+        argument[longitude]: Longitude of the location ex. -77.0352
     """
+    latitude = arguments[latitude]
+    longitude = arguments[longitude]
+
     # First get the forecast grid endpoint
     points_url = f"{NWS_API_BASE}/points/{latitude},{longitude}"
     points_data = await make_nws_request(points_url)

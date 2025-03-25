@@ -9,7 +9,7 @@ import mcp.server.stdio
 from mcp.server.models import InitializationOptions
 from mcp.server.lowlevel.server import NotificationOptions
 from mcp.types import Tool, TextContent
-from typing import Any, Sequence
+from typing import Any, Sequence, Text
 import httpx
 
 NWS_API_BASE = "https://api.weather.gov"
@@ -54,35 +54,27 @@ async def server_lifespan(server: Server) -> AsyncIterator[str]:
 server = Server("weather", lifespan=server_lifespan)
 
 
-@server.call_tool()
-async def get_weather(name: str, state: str) -> Sequence[TextContent]:
-    return [TextContent(type="text", text=f"Hello {state}")]
-
-
-@server.call_tool()
-async def get_alerts(name: str, arguments: dict) -> Sequence[TextContent]:
+async def get_alerts(state: str) -> str:
     """Get weather alerts for a US state
 
     Args:
         state: Two-letter US state code (e.g. CA, NY)
     """
 
-    url = f"{NWS_API_BASE}/alerts/active/area/{arguments["state"]}"
+    url = f"{NWS_API_BASE}/alerts/active/area/{state}"
     data = await make_nws_request(url)
 
     if not data or "features" not in data:
-        return [
-            TextContent(type="text", text=f"url: {url}, Unable to fetch alerts or no alerts found.")
-        ]
+        return f"url: {url}, Unable to fetch alerts or no alerts found."
+
     if not data["features"]:
-        return [TextContent(type="text", text="No active alerts for this state.")]
+        return "No active alerts for this state."
 
     alerts = [format_alert(feature) for feature in data["features"]]
-    return [TextContent(type="text", text="\n--\n".join(alerts))]
+    return "\n--\n".join(alerts)
 
 
-# @server.call_tool()
-async def get_forecast(name: str, latitude: float, longitude: float) -> Sequence[TextContent]:
+async def get_forecast(latitude: float, longitude: float) -> str:
     """Get weather forecast for a location.
 
     Args:
@@ -95,18 +87,14 @@ async def get_forecast(name: str, latitude: float, longitude: float) -> Sequence
     points_data = await make_nws_request(points_url)
 
     if not points_data:
-        return [
-            TextContent(
-                type="text", text="Unable to fetch forecast data for this location."
-            )
-        ]
+        return "Unable to fetch forecast data for this location."
 
     # Get the forecast URL from the points response
     forecast_url = points_data["properties"]["forecast"]
     forecast_data = await make_nws_request(forecast_url)
 
     if not forecast_data:
-        return [TextContent(type="text", text="Unable to fetch detailed forecast.")]
+        return "Unable to fetch detailed forecast."
 
     # Format the periods into a readable forecast
     periods = forecast_data["properties"]["periods"]
@@ -114,13 +102,25 @@ async def get_forecast(name: str, latitude: float, longitude: float) -> Sequence
 
     for period in periods[:5]:  # Only show next 5 period
         forecast = f"""
-                {period['name']}:
-                Temperature: {period['temperature']}°{period['temperatureUnit']}
-                Wind: {period['windSepeed']} {period['windDirection']}
-                Forecast: {period['detailedForecast']}
+{period['name']}:
+Temperature: {period['temperature']}°{period['temperatureUnit']}
+Wind: {period['windSpeed']} {period['windDirection']}
+Forecast: {period['detailedForecast']}
         """
         forecasts.append(forecast)
-    return [TextContent(type="text", text="\n--\n".join(forecasts))]
+    return "\n--\n".join(forecasts)
+
+
+@server.call_tool()
+async def call_tool(name: str, arguments: dict) -> Sequence[TextContent]:
+    # return [TextContent(type="text", text="test~")]
+    if name == "get_alerts":
+        result = await get_alerts(arguments["state"])
+        return [TextContent(type="text", text=result)]
+    elif name == "get_forecast":
+        result = await get_forecast(arguments["latitude"], arguments["longitude"])
+        return [TextContent(type="text", text=result)]
+    raise ValueError(f"Unknown tool: {name}")
 
 
 @server.list_tools()
@@ -131,14 +131,6 @@ async def list_tools() -> list[Tool]:
     if ctx and "weather":
         tools.extend(
             [
-                Tool(
-                    name="get_weather",
-                    description="Get the weather",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {"state": {"type": "string"}},
-                    },
-                ),
                 Tool(
                     name="get_alerts",
                     description="Get weather alerts for a US state",
@@ -151,6 +143,24 @@ async def list_tools() -> list[Tool]:
                             }
                         },
                         "required": ["state"],
+                    },
+                ),
+                Tool(
+                    name="get_forecast",
+                    description="Get weather forecast for a location",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "latitude": {
+                                "type": "number",
+                                "description": "Latitude of the location. ex. 38.8898",
+                            },
+                            "longitude": {
+                                "type": "number",
+                                "description": "Longitude of the location. ex. -77.009056",
+                            },
+                        },
+                        "required": ["latitude", "longitude"],
                     },
                 ),
             ]
@@ -181,7 +191,5 @@ def main():
     asyncio.run(run())
 
 
-#
-#
 if __name__ == "__main__":
     main()
