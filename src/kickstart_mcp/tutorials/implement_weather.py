@@ -38,7 +38,8 @@ class ImplementWeather(TutorialBase):
             self.step2()
         elif step_id == 3:
             self.step3()
-        self.handle_editor_options(self.target_file)
+        if not self.handle_editor_options(self.target_file):
+            return False
         return True
 
     def step1(self):
@@ -218,8 +219,8 @@ Forecast: {period['detailedForecast']}
                     return False
             else:
                 self.prompter.intense_instruct(f"You've completed step {self.current_step}!")
-                self.prompter.instruct("➤ Press any key to continue") 
-                self.prompter.get_key()
                 self.current_step += 1
+            self.prompter.instruct("➤ Press any key to continue") 
+            self.prompter.get_key()
 
         return True 
