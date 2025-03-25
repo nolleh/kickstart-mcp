@@ -26,7 +26,7 @@ class ImplementWeather(TutorialBase):
         if self.current_step == 1:
             return "NWS_API_BASE" in content and "make_nws_request" in content
         elif self.current_step == 2:
-            return "get_alerts" in content and "@server.list_tool()" in content
+            return "get_alerts" in content and "@server.list_tools()" in content
         elif self.current_step == 3:
             return "get_forecast" in content and "latitude: float" in content
         return False
