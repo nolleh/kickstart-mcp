@@ -46,7 +46,7 @@ class TutorialState:
             "mcp-server": TutorialGroup(
                 name="Mcp Server",
                 description="Make a MCP server",
-                tutorials=["MakeServer", "TestServer01", "ImplementWeather"]  # Add more tutorials as they are created
+                tutorials=["MakeServer", "TestServer01", "ImplementWeather", "ImplementSseTransport"]  # Add more tutorials as they are created
             ),
             "mcp-client": TutorialGroup(
                 name="Mcp Client",
