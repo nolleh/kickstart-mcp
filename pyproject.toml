@@ -33,7 +33,8 @@ dependencies = [
   "dotenv",
   "tomli",
   "tomli-w",
-  "pygments"
+  "pygments",
+  "pyperclip"
 ]
 
 [project.scripts]
