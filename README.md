@@ -1,40 +1,61 @@
 # kickstart-mcp
 
-[![PyPI - Version](https://img.shields.io/pypi/v/kickstart-mcp.svg)](https://pypi.org/project/kickstart-mcp)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/kickstart-mcp.svg)](https://pypi.org/project/kickstart-mcp)
+An interactive tutorial for learning Model Context Protocol (MCP). From setting up MCP hosts to building your own servers and clients, we'll guide you through every step of your MCP journey.
 
------
+## Features
 
-## Table of Contents
-
-- [Installation](#installation)
-- [License](#license)
+- Interactive tutorials for MCP setup and development
+- Step-by-step guides for different MCP hosts (Claude, Cursor, Custom)
+- Comprehensive coverage of MCP concepts:
+  - Host configuration
+  - Server development
+  - Client implementation
+- Built-in verification for each tutorial step
+- Cross-platform support (macOS, Windows)
 
 ## Installation
 
-```console
-pip install kickstart-mcp
+### Quick Start (Recommended)
+
+```bash
+uvx kickstart-mcp
 ```
+
+### Development Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/nolleh/kickstart-mcp.git
+cd kickstart-mcp
+
+# Install dependencies and run
+uv run kickstart-mcp
+```
+
+## Usage
+
+1. Start the tutorial:
+   ```bash
+   kickstart-mcp
+   ```
+
+2. Follow the interactive prompts to:
+   - Choose your preferred MCP host
+   - Complete each tutorial step
+   - Verify your progress
+   - Learn MCP concepts hands-on
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-`kickstart-mcp` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## Feedback
 
----
-
-1. hatch new project
-2. in project.toml, add [project.scripts]
-
-```toml
-[project.scripts]
-weather = weather:main
-```
-
-3. add depfor mcp
-```toml
-dependencies = [
-    "mcp"
-]
-modify requirepython
-```
+Have feedback or suggestions? Visit our [GitHub repository](https://github.com/nolleh/kickstart-mcp) to:
+- Open an issue
+- Submit a pull request
+- Start a discussion
