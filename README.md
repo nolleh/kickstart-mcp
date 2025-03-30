@@ -2,6 +2,9 @@
 
 An interactive tutorial for learning Model Context Protocol (MCP). From setting up MCP hosts to building your own servers and clients, we'll guide you through every step of your MCP journey.
 
+
+![AvaliableTutorial](./docs/images/available_tutorial.png)
+
 ## Features
 
 - Interactive tutorials for MCP setup and development
