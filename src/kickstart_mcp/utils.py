@@ -165,10 +165,10 @@ class Prompt:
 
             # Add copy option
             print(
-                f"\n{self.theme.text_color}➤ Press Enter to copy code to clipboard, or any other key to continue...{self.theme.reset}"
+                f"\n{self.theme.text_color}➤ Press 'c' to copy code to clipboard, or any other key to continue...{self.theme.reset}"
             )
             key = self.get_key()
-            if key == "\r":  # Enter key
+            if key == "c":  # Enter key
                 pyperclip.copy(text)
                 print(
                     f"{self.theme.success_color}Code copied to clipboard!{self.theme.reset}"
