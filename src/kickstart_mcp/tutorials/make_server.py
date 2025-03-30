@@ -49,7 +49,8 @@ class MakeServer(TutorialBase):
             self.step3()
         elif step_id == 4:
             self.step4()
-        self.handle_editor_options(self.target_file)
+        if not self.handle_editor_options(self.target_file):
+            return False
         return True
 
     def step1(self):
@@ -256,8 +257,8 @@ async def get_weather(name: str, state: str) -> Sequence[TextContent]:
             else:
                 # if self.check():
                 self.prompter.intense_instruct(f"You've done step:{self.current_step}")
-                self.prompter.instruct("➤ 1Press any key") 
-                self.prompter.get_key()
                 self.current_step += 1
+            self.prompter.instruct("➤ 1Press any key") 
+            self.prompter.get_key()
 
         return self.check() 

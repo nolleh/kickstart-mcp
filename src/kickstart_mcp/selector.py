@@ -237,6 +237,6 @@ class Selector:
                     # time.sleep(3)
                     
 
-        except Exception as e:
+        except Exception:
             print(f"Error running tutorial {tutorial.name}:", traceback.format_exc())
 
