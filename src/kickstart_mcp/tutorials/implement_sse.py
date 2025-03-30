@@ -49,7 +49,6 @@ class ImplementSseTransport(TutorialBase):
         self.prompter.instruct("\nIn MCP, transport layers typically come in two flavors:")
         self.prompter.instruct("1. stdio (Standard Input/Output) - Used for local integrations and command-line tools")
         self.prompter.instruct("2. SSE (Server-Sent Events) - Enables server-to-client streaming with HTTP POST requests")
-        
         self.prompter.instruct("\nLet's start by adding the run_server function that will handle both transport types.")
         self.prompter.instruct("Add this function to your file:")
         self.prompter.snippet(
@@ -124,8 +123,8 @@ uvicorn>=0.24.0'''
     asyncio.run(run_server(transport=args.transport, port=args.port))'''
         )
         self.prompter.instruct("\nNow you can run your server with either transport:")
-        self.prompter.instruct("For stdio: python -m mcp_weather")
-        self.prompter.instruct("For SSE: python -m mcp_weather --transport sse --port 8000")
+        self.prompter.instruct("For stdio: hatch run mcp_weather")
+        self.prompter.instruct("For SSE: hatch run mcp_weather --transport sse --port 9009")
 
     def run(self) -> bool:
         """Run the tutorial"""
