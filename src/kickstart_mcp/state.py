@@ -40,6 +40,11 @@ class TutorialState:
     def _load_groups(self) -> Dict[str, TutorialGroup]:
         """Load tutorial groups configuration"""
         return {
+            "hello-mcp": TutorialGroup(
+                name="Hello, mcp",
+                description="Let's use mcp",
+                tutorials=["HelloMcp"],
+            ),
             "python-project": TutorialGroup(
                 name="Python Project",
                 description="Basic project setup and configuration",

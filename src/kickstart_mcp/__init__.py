@@ -11,6 +11,7 @@ import logging
 
 import click
 from dotenv import load_dotenv
+from .utils import Prompt
 
 logger = logging.getLogger("kickstart-mcp")
 
@@ -52,47 +53,27 @@ def main(
     box_top = Fore.CYAN + Style.BRIGHT + "╔" + "═" * box_width + "╗"
     box_bottom = Fore.CYAN + Style.BRIGHT + "╚" + "═" * box_width + "╝"
     box_side = Fore.CYAN + Style.BRIGHT + "║"
-
+    #
     # Center the welcome message
     welcome_message = "Welcome to the kickstart-mcp."
     centered_message = welcome_message.center(box_width)
-
-    # Print the welcome message in a box
+    #
+    # # Print the welcome message in a box
     print(box_top)
     print(box_side + " " * box_width + box_side)
     print(box_side + centered_message + box_side)
     print(box_side + " " * box_width + box_side)
     print(box_bottom)
 
-    # Print the options
-    print(Fore.YELLOW + Style.BRIGHT + "➤ 1. Claude")
-    print(Fore.YELLOW + Style.BRIGHT + "➤ 2. Cursor")
-    print(Fore.YELLOW + Style.BRIGHT + "➤ 3. Custom")
+    # Print additional welcome message
+    print(Fore.WHITE + "\nLearn Model Context Protocol (MCP) through interactive tutorials!")
+    print(Fore.WHITE + "From setting up MCP hosts to building your own servers and clients,")
+    print(Fore.WHITE + "we'll guide you through every step of your MCP journey.\n")
+    print(Fore.YELLOW + "Have feedback? Visit: https://github.com/nolleh/kickstart-mcp\n")
 
-    choice = input(Fore.GREEN + "Enter the number of your choice: ").strip()
-
-    config = Config()
-   
-    if mcp_config_file:
-        config_path = mcp_config_file
-        config = load_config(config_path)
-    
-    else:
-        os_type = platform.system()
-        if choice == '1':
-            config_path = config.claude_config_map[os_type]
-            config = load_config(config_path)
-        elif choice == '2':
-            config_path = config.cursor_config_map[os_type]
-            config = load_config(config_path)
-        elif choice == '3':
-            config_path = config.custom_config_map[os_type]
-            config = load_config(config_path)
-        else:
-            print(Fore.RED + "Invalid choice. Please select 1, 2, or 3.")
-            return
-    
-    print(Fore.CYAN + "Loaded configuration:", config)
+    prompt = Prompt()
+    prompt.instruct("➤ Press any key to continue")
+    prompt.get_key()
 
     from .selector import Selector
     selector = Selector()
