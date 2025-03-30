@@ -31,7 +31,7 @@ class Credits(TutorialBase):
 ██║╚██╔╝██║██║     ██╔═══╝ 
 ██║ ╚═╝ ██║╚██████╗██║     
 ╚═╝     ╚═╝ ╚═════╝╚═╝     
-''', language=None)
+''', language=None, copy=False)
 
     def show_star_message(self):
         messages = [
@@ -62,7 +62,7 @@ class Credits(TutorialBase):
   |    MASTER!      ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶
   |                  ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶
    -------------------¶¶¶¶¶¶¶¶¶¶¶¶¶
-''', language=None)
+''', language=None, copy=False)
                     self.prompter.success("\nYou found the secret! You're a true gamer! 🎮")
                     time.sleep(2)
                     return

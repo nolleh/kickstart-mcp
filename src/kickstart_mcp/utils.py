@@ -91,7 +91,7 @@ class Prompt:
         """Read input from user"""
         return input(self.theme.text_color + prompt + self.theme.reset).strip()
 
-    def snippet(self, text: str, language: str | None = "python"):
+    def snippet(self, text: str, language: str | None = "python", copy: bool = True):
         """Display code snippet with syntax highlighting"""
         try:
             if language is not None:
@@ -164,15 +164,16 @@ class Prompt:
             print(self.theme.title_color + bottom_line + self.theme.reset)
 
             # Add copy option
-            print(
-                f"\n{self.theme.text_color}➤ Press 'c' to copy code to clipboard, or any other key to continue...{self.theme.reset}"
-            )
-            key = self.get_key()
-            if key == "c":  # Enter key
-                pyperclip.copy(text)
+            if copy:
                 print(
-                    f"{self.theme.success_color}Code copied to clipboard!{self.theme.reset}"
+                    f"\n{self.theme.text_color}➤ Press 'c' to copy code to clipboard, or any other key to continue...{self.theme.reset}"
                 )
+                key = self.get_key()
+                if key == "c":  # Enter key
+                    pyperclip.copy(text)
+                    print(
+                        f"{self.theme.success_color}Code copied to clipboard!{self.theme.reset}"
+                    )
 
         except Exception as e:
             # Fallback to non-highlighted version if highlighting fails
@@ -217,6 +218,17 @@ class Prompt:
             ch = sys.stdin.read(1)
             if ch == "\x03":  # Ctrl+C
                 raise KeyboardInterrupt
+            elif ch == "\x1b":  # ESC
+                # Read the next two characters for special keys
+                next_ch = sys.stdin.read(2)
+                if next_ch == "[A":  # Up arrow
+                    return "↑"
+                elif next_ch == "[B":  # Down arrow
+                    return "↓"
+                elif next_ch == "[C":  # Right arrow
+                    return "→"
+                elif next_ch == "[D":  # Left arrow
+                    return "←"
             return ch
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
