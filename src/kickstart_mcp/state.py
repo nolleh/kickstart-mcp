@@ -4,11 +4,13 @@ from typing import Dict, Optional, List
 from dataclasses import dataclass, asdict
 from collections import defaultdict
 
+
 @dataclass
 class TutorialGroup:
     name: str
     description: str
     tutorials: List[str]
+
 
 class TutorialState:
     def __init__(self):
@@ -20,7 +22,7 @@ class TutorialState:
         """Load state from file or create new if not exists"""
         if os.path.exists(self.state_file):
             try:
-                with open(self.state_file, 'r') as f:
+                with open(self.state_file, "r") as f:
                     return json.load(f)
             except json.JSONDecodeError:
                 return self._create_new_state()
@@ -32,7 +34,7 @@ class TutorialState:
             "completed_tutorials": [],
             "current_tutorial": None,
             "last_position": None,
-            "last_group": None
+            "last_group": None,
         }
 
     def _load_groups(self) -> Dict[str, TutorialGroup]:
@@ -41,28 +43,35 @@ class TutorialState:
             "python-project": TutorialGroup(
                 name="Python Project",
                 description="Basic project setup and configuration",
-                tutorials=["MakingProject", "ModifyToml", "ModifyInit"]
+                tutorials=["MakingProject", "ModifyToml", "ModifyInit"],
             ),
             "mcp-server": TutorialGroup(
                 name="Mcp Server",
                 description="Make a MCP server",
-                tutorials=["MakeServer", "TestServer01", "ImplementWeather", "ImplementSseTransport"]  # Add more tutorials as they are created
+                # Add more tutorials as they are created
+                tutorials=[
+                    "MakeServer",
+                    "TestServer01",
+                    "ImplementWeather",
+                    "ImplementSseTransport",
+                    "FastMcpWeather",
+                ],
             ),
             "mcp-client": TutorialGroup(
                 name="Mcp Client",
                 description="Make a MCP client",
-                tutorials=[]  # Add more tutorials as they are created
+                tutorials=[],  # Add more tutorials as they are created
             ),
             "miscellaneous": TutorialGroup(
                 name="Miscellaneous",
                 description="Before you leave..",
-                tutorials=["Credits"]
-            )
+                tutorials=["Credits"],
+            ),
         }
 
     def save_state(self):
         """Save current state to file"""
-        with open(self.state_file, 'w') as f:
+        with open(self.state_file, "w") as f:
             json.dump(self.state, f, indent=2)
 
     def mark_tutorial_completed(self, tutorial_name: str):
@@ -106,13 +115,14 @@ class TutorialState:
         """Calculate progress for a specific group"""
         if group_name not in self.groups:
             return 0.0
-        
+
         group = self.groups[group_name]
         if not group.tutorials:
             return 0.0
-        
-        completed = sum(1 for tutorial in group.tutorials 
-                       if self.is_tutorial_completed(tutorial))
+
+        completed = sum(
+            1 for tutorial in group.tutorials if self.is_tutorial_completed(tutorial)
+        )
         return completed / len(group.tutorials)
 
     def get_total_progress(self) -> float:
@@ -120,9 +130,13 @@ class TutorialState:
         total_tutorials = sum(len(group.tutorials) for group in self.groups.values())
         if total_tutorials == 0:
             return 0.0
-        
+
         total_completed = sum(
-            sum(1 for tutorial in group.tutorials if self.is_tutorial_completed(tutorial))
+            sum(
+                1
+                for tutorial in group.tutorials
+                if self.is_tutorial_completed(tutorial)
+            )
             for group in self.groups.values()
         )
         return total_completed / total_tutorials
@@ -132,4 +146,4 @@ class TutorialState:
         for group_name, group in self.groups.items():
             if tutorial_name in group.tutorials:
                 return group_name
-        return None 
+        return None
