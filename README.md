@@ -15,6 +15,15 @@ An interactive tutorial for learning Model Context Protocol (MCP). From setting 
 - Built-in verification for each tutorial step
 - Cross-platform support (macOS, Windows)
 
+
+## dependencies
+
+For package manager, recommend for using UV
+
+```bash
+brew install uv
+```
+
 ## Installation
 
 ### Quick Start (Recommended)
