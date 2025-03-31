@@ -2,7 +2,6 @@
 
 An interactive tutorial for learning Model Context Protocol (MCP). From setting up MCP hosts to building your own servers and clients, we'll guide you through every step of your MCP journey.
 
-
 ![AvaliableTutorial](./docs/images/available_tutorial.png)
 
 ## Features
@@ -38,8 +37,9 @@ uv run kickstart-mcp
 ## Usage
 
 1. Start the tutorial:
+
    ```bash
-   kickstart-mcp
+   uvx kickstart-mcp
    ```
 
 2. Follow the interactive prompts to:
@@ -47,6 +47,9 @@ uv run kickstart-mcp
    - Complete each tutorial step
    - Verify your progress
    - Learn MCP concepts hands-on
+
+> While it's recommended to follow tutorials in order, if you want to quickly learn server development,
+> you can start with FastMcp in the McpServer tutorial.
 
 ## Contributing
 
@@ -59,6 +62,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Feedback
 
 Have feedback or suggestions? Visit our [GitHub repository](https://github.com/nolleh/kickstart-mcp) to:
+
 - Open an issue
 - Submit a pull request
 - Start a discussion
