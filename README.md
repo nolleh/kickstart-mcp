@@ -2,7 +2,7 @@
 
 An interactive tutorial for learning Model Context Protocol (MCP). From setting up MCP hosts to building your own servers and clients, we'll guide you through every step of your MCP journey.
 
-![AvaliableTutorial](./docs/images/available_tutorial.png)
+![AvailableTutorial](./docs/images/available_tutorial.png)
 
 ## Features
 
@@ -15,29 +15,37 @@ An interactive tutorial for learning Model Context Protocol (MCP). From setting 
 - Built-in verification for each tutorial step
 - Cross-platform support (macOS, Windows)
 
+## Dependencies
 
-## dependencies
-
-For package manager, recommend for using UV
+For package management, we recommend using UV:
 
 ```bash
 brew install uv
 ```
 
-In instruction, used hatch to build tool. So follow the instruction, need to install hatch.
+The build tool used in the instructions is Hatch, so you'll need to install it as well:
 
 ```bash
 brew install hatch
 ```
-
 
 ## Installation
 
 ### Quick Start (Recommended)
 
 ```bash
-uvx kickstart-mcp
+uvx kickstart-mcp -l ko
 ```
+
+Since v0.1.0, you can use the `-l` option to specify your preferred language.
+Currently supported languages:
+
+| Code | Language |
+| ---- | -------- |
+| en   | English  |
+| ko   | Korean   |
+| zh   | Chinese  |
+| ja   | Japanese |
 
 ### Development Installation
 
@@ -64,7 +72,7 @@ uv run kickstart-mcp
    - Verify your progress
    - Learn MCP concepts hands-on
 
-> While it's recommended to follow tutorials in order, if you want to quickly learn server development,
+> While it's recommended to follow the tutorials in order, if you want to quickly learn server development,
 > you can start with FastMcp in the McpServer tutorial.
 
 ## Contributing
