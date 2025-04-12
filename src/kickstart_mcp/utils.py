@@ -8,6 +8,7 @@ import sys
 import pyperclip
 from typing import Optional
 from .i18n import i18n
+import unicodedata
 
 
 class Theme:
@@ -46,6 +47,28 @@ class Prompt:
         self.terminal_width = os.get_terminal_size().columns
         self.box_width = 40
 
+    def _get_display_width(self, text: str) -> int:
+        """Calculate the display width of text, accounting for multi-byte characters."""
+        width = 0
+        for char in text:
+            if unicodedata.east_asian_width(char) in ('W', 'F'):
+                width += 2
+            else:
+                width += 1
+        return width
+
+    def _center_text(self, text: str, width: int) -> str:
+        """Center text within a given width, accounting for multi-byte characters."""
+        text_width = self._get_display_width(text)
+        if text_width >= width:
+            return text
+
+        total_padding = width - text_width
+        left_padding = total_padding // 2
+        right_padding = total_padding - left_padding
+
+        return " " * left_padding + text + " " * right_padding
+
     def clear(self):
         """Clear the screen and move cursor to top"""
         os.system("cls" if os.name == "nt" else "clear")
@@ -55,7 +78,7 @@ class Prompt:
         box_bottom = Fore.CYAN + Style.BRIGHT + "╚" + "═" * self.box_width + "╝"
         box_side = Fore.CYAN + Style.BRIGHT + "║"
 
-        centered_title = title.center(self.box_width)
+        centered_title = self._center_text(title, self.box_width)
 
         print(box_top)
         print(box_side + " " * self.box_width + box_side)
@@ -115,8 +138,6 @@ class Prompt:
 
             # Find the longest line length (excluding ANSI codes)
             def strip_ansi(s):
-                import unicodedata
-
                 result = ""
                 i = 0
                 while i < len(s):
