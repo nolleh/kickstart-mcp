@@ -52,7 +52,7 @@ path = "src/kickstart_mcp/__about__.py"
 packages = ["src/kickstart_mcp"]
 include = [
     "data/**/*.csv",  # Include all CSV files in data directory
-    # "data/locales/**/*",  # Include all files in locales directory
+    "data/locales/**/*",  # Include all files in locales directory
 ]
 
 [tool.hatch.build.targets.sdist]

@@ -16,7 +16,7 @@ class MakeServer(TutorialBase):
     def check(self) -> bool:
         """Check if a specific step is completed"""
         if not self.verify_file_exists(self.target_file):
-            self.prompter.warn("Did you made the mcp-weather project?. \nDo previous tutorial first")
+            self.prompter.warn_with_key("make_server.warning")
             return False
 
         content = Path(self.target_file).read_text()
@@ -55,26 +55,25 @@ class MakeServer(TutorialBase):
 
     def step1(self):
         self.prompter.clear()
-        self.prompter.box("Step 1: Create Server Instance")
-        self.prompter.instruct("\nIn this step, you'll create a server instance with a lifespan manager.")
-        self.prompter.instruct("\nLet's break down what each part does:")
-        self.prompter.instruct("\n1. @asynccontextmanager decorator:")
-        self.prompter.instruct("   - This decorator helps manage the server's lifecycle")
-        self.prompter.instruct("   - It ensures proper setup and cleanup of server resources")
-        self.prompter.instruct("   - Similar to a context manager (with statement) but for async code")
-        
-        self.prompter.instruct("\n2. server_lifespan function:")
-        self.prompter.instruct("   - Manages the server's lifecycle events")
-        self.prompter.instruct("   - yield server.name: Provides context (in here, server.name) during its active lifetime")
-        self.prompter.intense_instruct("   - This context can be retrieved by accessing server.request_context")
-        self.prompter.instruct("   - The finally block: Place for cleanup code when server shuts down")
-        
-        self.prompter.instruct("\n3. Server instance creation:")
-        self.prompter.instruct("   - Creates a new mcp.server named 'weather'")
-        self.prompter.instruct("   - Attaches the lifespan manager to handle lifecycle events")
-        
-        
-        self.prompter.instruct("\nAdd the following code to the file:")
+        self.prompter.box_with_key("make_server.step1.title")
+        self.prompter.instruct_with_key("make_server.step1.intro1")
+        self.prompter.instruct_with_key("make_server.step1.intro2")
+        self.prompter.instruct_with_key("make_server.step1.decorator.title")
+        self.prompter.instruct_with_key("make_server.step1.decorator.1")
+        self.prompter.instruct_with_key("make_server.step1.decorator.2")
+        self.prompter.instruct_with_key("make_server.step1.decorator.3")
+
+        self.prompter.instruct_with_key("make_server.step1.lifespan.title")
+        self.prompter.instruct_with_key("make_server.step1.lifespan.1")
+        self.prompter.instruct_with_key("make_server.step1.lifespan.2")
+        self.prompter.intense_instruct_with_key("make_server.step1.lifespan.3")
+        self.prompter.instruct_with_key("make_server.step1.lifespan.4")
+
+        self.prompter.instruct_with_key("make_server.step1.instance.title")
+        self.prompter.instruct_with_key("make_server.step1.instance.1")
+        self.prompter.instruct_with_key("make_server.step1.instance.2")
+
+        self.prompter.instruct_with_key("make_server.step1.add_code")
         self.prompter.snippet(
             '''from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
@@ -83,35 +82,35 @@ from mcp.server import Server
 @asynccontextmanager
 async def server_lifespan(server: Server) -> AsyncIterator[str]:
 try:
-    ## This is just example. actual code, 
-    ## Using yield with time consuming resource, like db connection 
+    ## This is just example. actual code,
+    ## Using yield with time consuming resource, like db connection
     yield server.name
 finally:
     pass
 
 server = Server("weather", lifespan=server_lifespan)'''
         )
-        self.prompter.instruct("You also need to add dependency in project.toml file")
+        self.prompter.instruct_with_key("make_server.step1.dependency")
 
     def step2(self):
         self.prompter.clear()
-        self.prompter.box("Step 2: Add Run Function and Main")
-        self.prompter.instruct("\nIn this step, you'll add the run function and main entry point.")
-        self.prompter.instruct("\nMCP servers can be implemented in two ways:")
-        self.prompter.instruct("1. Local server via standard input/output (stdio)")
-        self.prompter.instruct("   - Direct communication through stdin/stdout")
-        self.prompter.instruct("   - Many MCP Servers are distributed with package that runnable with npx, uv")
-        self.prompter.instruct("   - So, MCP Host often directly run mcp server in local environment")
-        
-        self.prompter.instruct("\n2. HTTP server via Server-Sent Events (SSE)")
-        self.prompter.instruct("   - Web-based communication using SSE")
-        self.prompter.instruct("   - More complex but allows remote connections")
-        self.prompter.intense_instruct("   - Some MCP Host doesn't support this type of connection.")
+        self.prompter.box_with_key("make_server.step2.title")
+        self.prompter.instruct_with_key("make_server.step2.intro1")
+        self.prompter.instruct_with_key("make_server.step2.intro2")
+        self.prompter.instruct_with_key("make_server.step2.stdio.title")
+        self.prompter.instruct_with_key("make_server.step2.stdio.1")
+        self.prompter.instruct_with_key("make_server.step2.stdio.2")
+        self.prompter.instruct_with_key("make_server.step2.stdio.3")
 
-        self.prompter.instruct("\nIn this tutorial, we'll implement a stdio server for simplicity.")
-        self.prompter.instruct("The run function will set up the communication channel using stdio_server.")
-        
-        self.prompter.instruct("\nAdd the following code to the file:")
+        self.prompter.instruct_with_key("make_server.step2.sse.title")
+        self.prompter.instruct_with_key("make_server.step2.sse.1")
+        self.prompter.instruct_with_key("make_server.step2.sse.2")
+        self.prompter.intense_instruct_with_key("make_server.step2.sse.3")
+
+        self.prompter.instruct_with_key("make_server.step2.implement")
+        self.prompter.instruct_with_key("make_server.step2.setup")
+
+        self.prompter.instruct_with_key("make_server.step2.add_code")
         self.prompter.snippet(
             '''import mcp.server.stdio
 from mcp.server.models import InitializationOptions
@@ -137,31 +136,31 @@ def main():
 import asyncio
 asyncio.run(run())'''
         )
-        self.prompter.instruct("You also need to add dependency in project.toml file")
+        self.prompter.instruct_with_key("make_server.step2.dependency")
 
     def step3(self):
         self.prompter.clear()
-        self.prompter.box("Step 3: Add Tools")
-        self.prompter.instruct("\nTools are one of the core features of Model Context Protocol (MCP).")
-        self.prompter.instruct("They enable AI models to interact with external systems and perform actual tasks.")
-        
-        self.prompter.instruct("\nKey points about Tools:")
-        self.prompter.instruct("1. Model-centric control:")
-        self.prompter.instruct("   - Designed for model-centric control")
-        self.prompter.instruct("   - AI models can understand context and automatically find and call tools")
-        
-        self.prompter.instruct("\n2. Safety and reliability:")
-        self.prompter.instruct("   - User approval is always required for actual tool execution")
-        self.prompter.instruct("   - Ensures safe and controlled interaction with external systems")
-        
-        self.prompter.instruct("\n3. Input Schema:")
-        self.prompter.instruct("   - Defines the structure of input parameters for each tool")
-        self.prompter.instruct("   - Uses JSON Schema format to specify:")
-        self.prompter.instruct("     * Parameter types")
-        self.prompter.instruct("     * Parameter descriptions")
-        self.prompter.instruct("     * Required parameters")
+        self.prompter.box_with_key("make_server.step3.title")
+        self.prompter.instruct_with_key("make_server.step3.intro1")
+        self.prompter.instruct_with_key("make_server.step3.intro2")
 
-        self.prompter.instruct("\nTools structure")
+        self.prompter.instruct_with_key("make_server.step3.keypoints.title")
+        self.prompter.instruct_with_key("make_server.step3.model.title")
+        self.prompter.instruct_with_key("make_server.step3.model.1")
+        self.prompter.instruct_with_key("make_server.step3.model.2")
+
+        self.prompter.instruct_with_key("make_server.step3.safety.title")
+        self.prompter.instruct_with_key("make_server.step3.safety.1")
+        self.prompter.instruct_with_key("make_server.step3.safety.2")
+
+        self.prompter.instruct_with_key("make_server.step3.schema.title")
+        self.prompter.instruct_with_key("make_server.step3.schema.1")
+        self.prompter.instruct_with_key("make_server.step3.schema.2")
+        self.prompter.instruct_with_key("make_server.step3.schema.3")
+        self.prompter.instruct_with_key("make_server.step3.schema.4")
+        self.prompter.instruct_with_key("make_server.step3.schema.5")
+
+        self.prompter.instruct_with_key("make_server.step3.structure")
         self.prompter.snippet(
             '''{
     "name": "tool_name",
@@ -177,8 +176,8 @@ asyncio.run(run())'''
     "required": ["required_parameter_list"]
     }
 }''')
-        
-        self.prompter.instruct("\nAdd the following code to the file:")
+
+        self.prompter.instruct_with_key("make_server.step3.add_code")
         self.prompter.snippet(
             '''from mcp.types import Tool
 
@@ -204,11 +203,11 @@ async def list_tools() -> list[Tool]:
 
     def step4(self):
         self.prompter.clear()
-        self.prompter.box("Step 4: Implement Tool Handler")
-        self.prompter.instruct("\nNow we'll implement the tool handler using ModelContextProtocol's call_tool.")
-        self.prompter.instruct("The tool handler is called based on the tool information received through list_tools.")
-        
-        self.prompter.instruct("\nTool Call Request Format:")
+        self.prompter.box_with_key("make_server.step4.title")
+        self.prompter.instruct_with_key("make_server.step4.intro1")
+        self.prompter.instruct_with_key("make_server.step4.intro2")
+
+        self.prompter.instruct_with_key("make_server.step4.request_format")
         self.prompter.snippet(
             '''{
   "jsonrpc": "2.0",
@@ -222,8 +221,8 @@ async def list_tools() -> list[Tool]:
   }
 }'''
         )
-        
-        self.prompter.instruct("\nTool Call Response Format:")
+
+        self.prompter.instruct_with_key("make_server.step4.response_format")
         self.prompter.snippet(
             '''{
   "jsonrpc": "2.0",
@@ -237,10 +236,10 @@ async def list_tools() -> list[Tool]:
   }
 }'''
         )
-        
-        self.prompter.instruct("\nAdd the following code to the file:")
+
+        self.prompter.instruct_with_key("make_server.step4.add_code")
         self.prompter.snippet(
-            '''from mcp.types import Tool, TextContent 
+            '''from mcp.types import Tool, TextContent
 from typing import Sequence
 
 @server.call_tool()
@@ -258,7 +257,7 @@ async def get_weather(name: str, state: str) -> Sequence[TextContent]:
                 # if self.check():
                 self.prompter.intense_instruct(f"You've done step:{self.current_step}")
                 self.current_step += 1
-            self.prompter.instruct("➤ 1Press any key") 
+            self.prompter.instruct("➤ 1Press any key")
             self.prompter.get_key()
 
-        return self.check() 
+        return self.check()

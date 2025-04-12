@@ -1,0 +1,6 @@
+key,value
+modify_init.title,"Modify __init__.py"
+modify_init.intro1,"In this tutorial, you'll learn how to modify the __init__.py file."
+modify_init.intro2,"You'll need to add a main function that prints 'hello, world'."
+modify_init.intro3,"Add the following code to the file:"
+modify_init.warning,"Did you made the mcp-weather project?. \nDo previous tutorial first"

@@ -1,0 +1,6 @@
+key,value
+modify_init.title,"__init__.py 파일 수정하기"
+modify_init.intro1,"이 튜토리얼에서는 __init__.py 파일을 수정하는 방법을 배웁니다."
+modify_init.intro2,"'hello, world'를 출력하는 main 함수를 추가해야 합니다."
+modify_init.intro3,"다음 코드를 파일에 추가하세요:"
+modify_init.warning,"mcp-weather 프로젝트를 만들었나요?. \n이전 튜토리얼을 먼저 완료하세요"

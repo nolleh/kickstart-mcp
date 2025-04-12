@@ -133,7 +133,7 @@ class Prompt:
         """Read input from user"""
         return input(self.theme.text_color + prompt + self.theme.reset).strip()
 
-    def snippet(self, code: str, language: Optional[str] = None, copy: bool = True):
+    def snippet(self, code: str, language: Optional[str] = "python", copy: bool = True):
         """Display code snippet with syntax highlighting"""
         try:
             if language is not None:
