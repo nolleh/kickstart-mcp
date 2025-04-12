@@ -51,7 +51,7 @@ class Prompt:
         """Calculate the display width of text, accounting for multi-byte characters."""
         width = 0
         for char in text:
-            if unicodedata.east_asian_width(char) in ('W', 'F'):
+            if unicodedata.east_asian_width(char) in ("W", "F"):
                 width += 2
             else:
                 width += 1
@@ -111,11 +111,23 @@ class Prompt:
     def warn(self, message: str):
         print(Fore.YELLOW + message)
 
+    def warn_with_key(self, key: str):
+        message = i18n.get(key)
+        self.warn(message)
+
+    def error_with_key(self, key: str):
+        message = i18n.get(key)
+        self.error(message)
+
     def error(self, message: str):
         print(Fore.RED + message)
 
     def success(self, message: str):
         print(Fore.GREEN + message)
+
+    def success_with_key(self, key: str):
+        message = i18n.get(key)
+        self.success(message)
 
     def read(self, prompt: str) -> str:
         """Read input from user"""
