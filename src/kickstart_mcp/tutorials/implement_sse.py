@@ -42,15 +42,15 @@ class ImplementSseTransport(TutorialBase):
 
     def step1(self):
         self.prompter.clear()
-        self.prompter.box("Step 1: Introduction to SSE Transport")
-        self.prompter.intense_instruct("Congratulations! You've successfully implemented a weather MCP server with alerts and forecasts.")
-        self.prompter.intense_instruct("Now, let's enhance your server by adding SSE transport support.")
-        
-        self.prompter.instruct("\nIn MCP, transport layers typically come in two flavors:")
-        self.prompter.instruct("1. stdio (Standard Input/Output) - Used for local integrations and command-line tools")
-        self.prompter.instruct("2. SSE (Server-Sent Events) - Enables server-to-client streaming with HTTP POST requests")
-        self.prompter.instruct("\nLet's start by adding the run_server function that will handle both transport types.")
-        self.prompter.instruct("Add this function to your file:")
+        self.prompter.box_with_key("implement_sse.step1.title")
+        self.prompter.intense_instruct_with_key("implement_sse.step1.intro1")
+        self.prompter.intense_instruct_with_key("implement_sse.step1.intro2")
+
+        self.prompter.instruct_with_key("implement_sse.step1.transport_types.title")
+        self.prompter.instruct_with_key("implement_sse.step1.transport_types.1")
+        self.prompter.instruct_with_key("implement_sse.step1.transport_types.2")
+        self.prompter.instruct_with_key("implement_sse.step1.add_function")
+        self.prompter.instruct_with_key("implement_sse.step1.add_code")
         self.prompter.snippet(
             '''async def run_server(transport: str = "stdio", port: int = 8000) -> None:
     """Run the MCP server with the specified transport."""
@@ -96,20 +96,20 @@ class ImplementSseTransport(TutorialBase):
 
     def step2(self):
         self.prompter.clear()
-        self.prompter.box("Step 2: Add Dependencies")
-        self.prompter.instruct("\nNow we need to add the required dependencies for SSE transport.")
-        self.prompter.instruct("Add these to your project's dependencies:")
+        self.prompter.box_with_key("implement_sse.step2.title")
+        self.prompter.instruct_with_key("implement_sse.step2.intro1")
+        self.prompter.instruct_with_key("implement_sse.step2.intro2")
         self.prompter.snippet(
             '''starlette>=0.27.0
 uvicorn>=0.24.0'''
         )
-        self.prompter.instruct("\nYou can add these to your pyproject.toml or requirements.txt file.")
+        self.prompter.instruct_with_key("implement_sse.step2.intro3")
 
     def step3(self):
         self.prompter.clear()
-        self.prompter.box("Step 3: Update Main Entry Point")
-        self.prompter.instruct("\nFinally, let's update the main entry point to use our new run_server function.")
-        self.prompter.instruct("Replace your existing main block with:")
+        self.prompter.box_with_key("implement_sse.step3.title")
+        self.prompter.instruct_with_key("implement_sse.step3.intro1")
+        self.prompter.instruct_with_key("implement_sse.step3.intro2")
         self.prompter.snippet(
             '''if __name__ == "__main__":
     import asyncio
@@ -122,9 +122,9 @@ uvicorn>=0.24.0'''
 
     asyncio.run(run_server(transport=args.transport, port=args.port))'''
         )
-        self.prompter.instruct("\nNow you can run your server with either transport:")
-        self.prompter.instruct("For stdio: hatch run mcp_weather")
-        self.prompter.instruct("For SSE: hatch run mcp_weather --transport sse --port 9009")
+        self.prompter.instruct_with_key("implement_sse.step3.intro3")
+        self.prompter.instruct_with_key("implement_sse.step3.intro4")
+        self.prompter.instruct_with_key("implement_sse.step3.intro5")
 
     def run(self) -> bool:
         """Run the tutorial"""
@@ -133,9 +133,9 @@ uvicorn>=0.24.0'''
                 if not self.run_step(self.current_step):
                     return False
             else:
-                self.prompter.intense_instruct(f"You've completed step {self.current_step}!")
+                self.prompter.intense_instruct_with_key("implement_sse.step_complete", self.current_step)
                 self.current_step += 1
-            self.prompter.instruct("➤ Press any key to continue") 
+            self.prompter.instruct_with_key("implement_sse.press_continue")
             self.prompter.get_key()
 
-        return True 
+        return True
