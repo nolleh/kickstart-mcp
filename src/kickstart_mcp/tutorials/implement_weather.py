@@ -3,11 +3,12 @@ from ..tutorial_base import TutorialBase
 from ..utils import Prompt
 from pathlib import Path
 
+
 class ImplementWeather(TutorialBase):
     def __init__(self):
         super().__init__(
             name="ImplementWeather",
-            description="Learn how to implement real weather functionality using National Weather Service API"
+            description="Learn how to implement real weather functionality using National Weather Service API",
         )
         self.target_file = "mcp-weather/src/mcp_weather/__init__.py"
         self.current_step = 1
@@ -16,7 +17,7 @@ class ImplementWeather(TutorialBase):
     def check(self) -> bool:
         """Check if a specific step is completed"""
         if not self.verify_file_exists(self.target_file):
-            self.prompter.warn("Did you complete the previous MakeServer tutorial first?")
+            self.prompter.warn_with_key("implement_weather.warning")
             return False
 
         content = Path(self.target_file).read_text()
@@ -44,19 +45,19 @@ class ImplementWeather(TutorialBase):
 
     def step1(self):
         self.prompter.clear()
-        self.prompter.box("Step 1: Add Helper Functions")
-        self.prompter.intense_instruct("The previous server is working, but it's not very useful.")
-        self.prompter.intense_instruct("Let's make it more practical.")
-        self.prompter.instruct("\nFirst, we'll add helper functions to interact with the National Weather Service API.")
-        self.prompter.instruct("These functions will help us make HTTP requests and format the responses.")
-        
-        self.prompter.instruct("\nWe need to:")
-        self.prompter.instruct("1. Add necessary imports")
-        self.prompter.instruct("2. Define API constants")
-        self.prompter.instruct("3. Create helper functions for API requests")
-        self.prompter.instruct("4. Create response formatters")
-        
-        self.prompter.instruct("\nAdd the following code to the beginning of your file:")
+        self.prompter.box_with_key("implement_weather.step1.title")
+        self.prompter.intense_instruct_with_key("implement_weather.step1.intro1")
+        self.prompter.intense_instruct_with_key("implement_weather.step1.intro2")
+        self.prompter.instruct_with_key("implement_weather.step1.intro3")
+        self.prompter.instruct_with_key("implement_weather.step1.intro4")
+
+        self.prompter.instruct_with_key("implement_weather.step1.todo.title")
+        self.prompter.instruct_with_key("implement_weather.step1.todo.1")
+        self.prompter.instruct_with_key("implement_weather.step1.todo.2")
+        self.prompter.instruct_with_key("implement_weather.step1.todo.3")
+        self.prompter.instruct_with_key("implement_weather.step1.todo.4")
+
+        self.prompter.instruct_with_key("implement_weather.step1.add_code")
         self.prompter.snippet(
             '''from typing import Any, Sequence
 import httpx
@@ -92,20 +93,19 @@ Description: {props.get('description', 'No description available')}
 Instructions: {props.get('instruction', 'No specific instructions provided')}
 """'''
         )
-        self.prompter.instruct("\nDon't forget to add httpx to your project dependencies!")
+        self.prompter.instruct_with_key("implement_weather.step1.dependency")
 
     def step2(self):
         self.prompter.clear()
-        self.prompter.box("Step 2: Implement Weather Alerts Tool")
-        self.prompter.instruct("\nNow we'll modify the list_tools and implement get_alerts functionality.")
-        self.prompter.instruct("This will allow users to get weather alerts for any US state.")
-        self.prompter.intense_instruct("\nThe get_weather function from the previous tutorial is not very useful, so we'll remove it.")
+        self.prompter.box_with_key("implement_weather.step2.title")
+        self.prompter.instruct_with_key("implement_weather.step2.intro1")
+        self.prompter.instruct_with_key("implement_weather.step2.intro2")
+        self.prompter.intense_instruct_with_key("implement_weather.step2.intro3")
+        self.prompter.intense_instruct_with_key("implement_weather.step2.intro4")
 
-        self.prompter.intense_instruct("We'll also modify the call_tool function to determine which tool should be called.")
-        
-        self.prompter.instruct("\nReplace your existing list_tools with:")
+        self.prompter.instruct_with_key("implement_weather.step2.replace_list")
         self.prompter.snippet(
-            '''@server.list_tools()
+            """@server.list_tools()
 async def list_tools() -> list[Tool]:
     tools = []
     ctx = server.request_context.lifespan_context
@@ -127,10 +127,12 @@ async def list_tools() -> list[Tool]:
                 }
             ),
         ])
-    return tools''')
+    return tools"""
+        )
 
-        self.prompter.instruct("\nAnd also, replace your existing call_tool, and add get_alerts with:")
-        self.prompter.snippet('''
+        self.prompter.instruct_with_key("implement_weather.step2.replace_call")
+        self.prompter.snippet(
+            '''
 @server.call_tool()
 async def call_tool(name: str, arguments: dict) -> Sequence[TextContent]:
     # return [TextContent(type="text", text="test~")]
@@ -161,13 +163,13 @@ async def get_alerts(state: str) -> str:
 
     def step3(self):
         self.prompter.clear()
-        self.prompter.box("Step 3: Add Forecast Tool")
-        self.prompter.instruct("\nFinally, we'll add the get_forecast tool to get detailed weather forecasts.")
-        self.prompter.instruct("This tool will use latitude and longitude to get location-specific forecasts.")
-        
-        self.prompter.instruct("\nAdd this to your list_tools function (inside tools.extend):")
+        self.prompter.box_by_key("implement_weather.step3.title")
+        self.prompter.instruct_with_key("implement_weather.step3.intro1")
+        self.prompter.instruct_with_key("implement_weather.step3.intro2")
+
+        self.prompter.instruct_with_key("implement_weather.step3.add_list")
         self.prompter.snippet(
-            ''' 
+            """
             Tool(
                 name="get_forecast",
                 description="Get weather forecast for a location",
@@ -186,10 +188,10 @@ async def get_alerts(state: str) -> str:
                     "required": ["latitude", "longitude"],
                 },
             ),
-            '''
+            """
         )
-        
-        self.prompter.instruct("\nAnd add this new tool implementation:")
+
+        self.prompter.instruct_with_key("implement_weather.step3.add_impl")
         self.prompter.snippet(
             '''
 @server.call_tool()
@@ -244,9 +246,11 @@ Forecast: {period['detailedForecast']}
                 if not self.run_step(self.current_step):
                     return False
             else:
-                self.prompter.intense_instruct(f"You've completed step {self.current_step}!")
+                self.prompter.intense_instruct_with_key(
+                    "implement_weather.step_complete", self.current_step
+                )
                 self.current_step += 1
-            self.prompter.instruct("➤ Press any key to continue") 
+            self.prompter.instruct_with_key("implement_weather.press_continue")
             self.prompter.get_key()
 
-        return True 
+        return True

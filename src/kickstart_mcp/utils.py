@@ -104,8 +104,8 @@ class Prompt:
     def intense_instruct(self, message: str):
         print(Fore.MAGENTA + Style.BRIGHT + message)
 
-    def intense_instruct_with_key(self, key: str):
-        message = i18n.get(key)
+    def intense_instruct_with_key(self, key: str, *args):
+        message = i18n.get(key, *args)
         self.intense_instruct(message)
 
     def warn(self, message: str):

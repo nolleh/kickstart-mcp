@@ -1,11 +1,12 @@
 from ..tutorial_base import TutorialBase
 import os
 
+
 class TestServer01(TutorialBase):
     def __init__(self):
         super().__init__(
             name="TestServer01",
-            description="Learn how to test the weather server using MCP Inspector"
+            description="Learn how to test the weather server using MCP Inspector",
         )
         self.current_step = 1
         self.total_steps = 1
@@ -24,13 +25,13 @@ class TestServer01(TutorialBase):
 
             self.prompter.instruct_with_key("test_server01.follow")
 
+            self.prompter.snippet("""$ npx @model_context_protocol/inspector""")
             self.prompter.snippet(
-                '''$ npx @model_context_protocol/inspector''')
-            self.prompter.snippet('''
+                """
 Starting MCP inspector...
 Proxy server listening on port 3000
 
-🔍 MCP Inspector is up and running at http://localhost:5173 🚀'''
+🔍 MCP Inspector is up and running at http://localhost:5173 🚀"""
             )
 
             self.prompter.instruct_with_key("test_server01.access")
