@@ -4,13 +4,10 @@
 
 import os
 import json
-from colorama import init, Fore, Style
-import platform
-from .config import Config
+from colorama import init, Fore
 import logging
 
 import click
-from dotenv import load_dotenv
 from .utils import Prompt
 from .i18n import i18n
 
