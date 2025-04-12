@@ -1,0 +1,6 @@
+key,value
+make_project.title,"1. 让我们创建一个项目"
+make_project.instruction,"输入以下命令创建新项目。（应该已经安装了 hatch 命令。\n如果您使用 brew，请运行 brew install hatch）"
+make_project.command,"➤ hatch new mcp-weather"
+make_project.prompt,"输入命令："
+make_project.invalid_command,"无效命令。请重试。"

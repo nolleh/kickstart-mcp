@@ -1,5 +1,5 @@
 import csv
-from typing import Dict, Optional
+from typing import Dict
 import logging
 from importlib.resources import files
 
@@ -10,7 +10,7 @@ class I18n:
     def __init__(self):
         self.current_lang = None
         self.resources: Dict[str, Dict[str, str]] = {}
-        self.supported_languages = ["en", "ko"]
+        self.supported_languages = ["en", "ko", "zh", "ja"]
         self.default_lang = "en"
 
     def load_language(self, lang: str) -> None:

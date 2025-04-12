@@ -1,0 +1,12 @@
+key,value
+test_server01.title,"测试天气服务器"
+test_server01.intro1,"现在让我们运行并测试我们创建的mcp-weather服务器。"
+test_server01.intro2,"与之前的教程不同，这个教程不涉及代码编写或验证代码编辑完成。相反，我们将启动MCPServer并通过检查器进行测试。"
+test_server01.follow,"请按照说明自己执行测试。"
+test_server01.inspector_command,"$ npx @model_context_protocol/inspector"
+test_server01.inspector_output,"正在启动MCP检查器...\n代理服务器正在端口3000上监听\n\n🔍 MCP检查器已在 http://localhost:5173 启动 🚀"
+test_server01.access,"在浏览器中访问 http://localhost:5173"
+test_server01.enter,"输入：STDIO, uv, --directory path/to/kickstart-mcp/mcp-weather run mcp-weather"
+test_server01.connect,"点击连接以列出和测试工具。"
+test_server01.after_test,"执行测试后，请参考以下文档。"
+test_server01.press_key,"➤ 按任意键打开参考文档\n（使用系统默认应用程序打开）"

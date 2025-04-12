@@ -1,0 +1,6 @@
+key,value
+make_project.title,"1. プロジェクトを作成しましょう"
+make_project.instruction,"新しいプロジェクトを作成するには、以下のコマンドを入力してください。（hatchコマンドは事前にインストールされている必要があります。\n brewを使用している場合は、brew install hatchを実行してください）"
+make_project.command,"➤ hatch new mcp-weather"
+make_project.prompt,"コマンドを入力してください："
+make_project.invalid_command,"無効なコマンドです。もう一度お試しください。"

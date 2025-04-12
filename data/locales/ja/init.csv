@@ -1,0 +1,7 @@
+key,value
+init.welcome.title,"kickstart-mcpへようこそ"
+init.welcome.description,"インタラクティブなチュートリアルでモデルコンテキストプロトコル（MCP）を学びましょう！"
+init.welcome.description2,"MCPホストの設定から独自のサーバーやクライアントの構築まで、MCPの旅のすべてのステップをガイドします。"
+init.welcome.feedback,"フィードバックをお持ちですか？こちらをご覧ください：https://github.com/nolleh/kickstart-mcp"
+init.language.modify,"-lオプションを使用してプログラムを実行することで言語を変更できます。例：-l ko"
+init.language.continue,"任意のキーを押して続行"

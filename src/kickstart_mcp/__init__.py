@@ -45,7 +45,7 @@ def load_config(path):
 @click.option(
     "--mcp-config-file", type=click.Path(dir_okay=False), help="Path to MCP config file"
 )
-@click.option("--lang", "-l", default="en", help="Language for the tutorial (en/ko)")
+@click.option("--lang", "-l", default="en", help="Language for the tutorial (en/ko/zh/ja)")
 def main(
     verbose: bool, env_file: str | None, mcp_config_file: str | None, lang: str
 ) -> None:

@@ -1,0 +1,7 @@
+key,value
+init.welcome.title,"欢迎使用 kickstart-mcp"
+init.welcome.description,"通过互动教程学习模型上下文协议 (MCP)！"
+init.welcome.description2,"从设置 MCP 主机到构建您自己的服务器和客户端，我们将指导您完成 MCP 之旅的每一步。"
+init.welcome.feedback,"有反馈意见？请访问：https://github.com/nolleh/kickstart-mcp"
+init.language.modify,"您可以通过使用 -l 选项运行程序来修改语言。例如：-l ko"
+init.language.continue,"按任意键继续"

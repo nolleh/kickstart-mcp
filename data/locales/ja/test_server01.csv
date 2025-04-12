@@ -1,0 +1,12 @@
+key,value
+test_server01.title,"Weatherサーバーのテスト"
+test_server01.intro1,"作成したmcp-weatherサーバーを実行してテストしましょう。"
+test_server01.intro2,"前のチュートリアルとは異なり、このチュートリアルではコードの記述やコード編集の完了確認は行いません。代わりに、MCPServerを起動し、インスペクターを通じてテストします。"
+test_server01.follow,"指示に従って、自分でテストを実行してください。"
+test_server01.inspector_command,"$ npx @model_context_protocol/inspector"
+test_server01.inspector_output,"MCPインスペクターを起動しています...\nプロキシサーバーがポート3000でリッスンしています\n\n🔍 MCPインスペクターが http://localhost:5173 で起動しました 🚀"
+test_server01.access,"ブラウザで http://localhost:5173 にアクセスしてください"
+test_server01.enter,"以下を入力してください：STDIO, uv, --directory path/to/kickstart-mcp/mcp-weather run mcp-weather"
+test_server01.connect,"接続をクリックしてツールを一覧表示し、テストしてください。"
+test_server01.after_test,"テスト実行後、以下のドキュメントを参照してください。"
+test_server01.press_key,"➤ 参照ドキュメントを開くには任意のキーを押してください\n（システムのデフォルトアプリケーションで開きます）"

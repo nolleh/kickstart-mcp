@@ -1,0 +1,6 @@
+key,value
+modify_init.title,"修改 __init__.py"
+modify_init.intro1,"在本教程中，您将学习如何修改 __init__.py 文件。"
+modify_init.intro2,"您需要添加一个打印 'hello, world' 的主函数。"
+modify_init.intro3,"将以下代码添加到文件中："
+modify_init.warning,"您是否已经创建了 mcp-weather 项目？\n请先完成之前的教程"

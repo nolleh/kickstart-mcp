@@ -1,0 +1,6 @@
+key,value
+modify_init.title,"__init__.pyを修正する"
+modify_init.intro1,"このチュートリアルでは、__init__.pyファイルを修正する方法を学びます。"
+modify_init.intro2,"'hello, world'と表示するmain関数を追加する必要があります。"
+modify_init.intro3,"ファイルに以下のコードを追加してください："
+modify_init.warning,"mcp-weatherプロジェクトを作成しましたか？\n前のチュートリアルを先に完了してください"
