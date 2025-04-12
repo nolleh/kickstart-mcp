@@ -1,0 +1,12 @@
+key,value
+test_server01.title,"Test Weather Server"
+test_server01.intro1,"Now let's run and test the mcp-weather server we've created."
+test_server01.intro2,"Unlike previous tutorials, this one doesn't involve code writing or verifying code editing completion. Instead, we'll launch our MCPServer and test it through the inspector."
+test_server01.follow,"Please follow the instructions to perform the test yourself."
+test_server01.inspector_command,"$ npx @model_context_protocol/inspector"
+test_server01.inspector_output,"Starting MCP inspector...\nProxy server listening on port 3000\n\n🔍 MCP Inspector is up and running at http://localhost:5173 🚀"
+test_server01.access,"Access http://localhost:5173 in your browser"
+test_server01.enter,"Enter: STDIO, uv, --directory path/to/kickstart-mcp/mcp-weather run mcp-weather"
+test_server01.connect,"Click connect to list and test the tools."
+test_server01.after_test,"After performing the test, please refer to the following document."
+test_server01.press_key,"➤ Press any key to open the reference document\n(open with system default application)"

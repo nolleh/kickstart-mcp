@@ -1,0 +1,12 @@
+key,value
+test_server01.title,"날씨 서버 테스트"
+test_server01.intro1,"이제 우리가 만든 mcp-weather 서버를 실행하고 테스트해보겠습니다."
+test_server01.intro2,"이전 튜토리얼과 달리 이번에는 코드 작성이나 코드 편집 완료 확인이 필요하지 않습니다. 대신, MCPServer를 실행하고 inspector를 통해 테스트할 것입니다."
+test_server01.follow,"테스트를 수행하기 위해 다음 지시사항을 따라주세요."
+test_server01.inspector_command,"$ npx @model_context_protocol/inspector"
+test_server01.inspector_output,"MCP inspector 시작 중...\n프록시 서버가 3000 포트에서 수신 중\n\n🔍 MCP Inspector가 http://localhost:5173 에서 실행 중입니다 🚀"
+test_server01.access,"브라우저에서 http://localhost:5173 에 접속하세요"
+test_server01.enter,"입력: STDIO, uv, --directory path/to/kickstart-mcp/mcp-weather run mcp-weather"
+test_server01.connect,"연결을 클릭하여 도구를 나열하고 테스트하세요."
+test_server01.after_test,"테스트를 완료한 후, 다음 문서를 참조하세요."
+test_server01.press_key,"➤ 참조 문서를 열려면 아무 키나 누르세요\n(시스템 기본 애플리케이션으로 열림)"
