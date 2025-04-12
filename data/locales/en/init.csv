@@ -1,0 +1,7 @@
+key,value
+init.welcome.title,"Welcome to the kickstart-mcp"
+init.welcome.description,"Learn Model Context Protocol (MCP) through interactive tutorials!"
+init.welcome.description2,"From setting up MCP hosts to building your own servers and clients, we'll guide you through every step of your MCP journey."
+init.welcome.feedback,"Have feedback? Visit: https://github.com/nolleh/kickstart-mcp"
+init.language.modify,"You can modify language by running the program with -l option. ex: -l ko"
+init.language.continue,"Press any key to continue"

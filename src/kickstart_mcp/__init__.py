@@ -63,36 +63,6 @@ def main(
 
     # Initialize colorama
     init(autoreset=True)
-    # Define box characters
-    box_width = 40
-    box_top = Fore.CYAN + Style.BRIGHT + "╔" + "═" * box_width + "╗"
-    box_bottom = Fore.CYAN + Style.BRIGHT + "╚" + "═" * box_width + "╝"
-    box_side = Fore.CYAN + Style.BRIGHT + "║"
-    #
-    # Center the welcome message
-    welcome_message = "Welcome to the kickstart-mcp"
-    centered_message = welcome_message.center(box_width)
-    #
-    # # Print the welcome message in a box
-    print(box_top)
-    print(box_side + " " * box_width + box_side)
-    print(box_side + centered_message + box_side)
-    print(box_side + " " * box_width + box_side)
-    print(box_bottom)
-
-    # Print additional welcome message
-    print(
-        Fore.WHITE
-        + "\nLearn Model Context Protocol (MCP) through interactive tutorials!"
-    )
-    print(
-        Fore.WHITE
-        + "From setting up MCP hosts to building your own servers and clients,"
-    )
-    print(Fore.WHITE + "we'll guide you through every step of your MCP journey.\n")
-    print(
-        Fore.YELLOW + "Have feedback? Visit: https://github.com/nolleh/kickstart-mcp\n"
-    )
 
     prompt = Prompt()
     try:
@@ -101,10 +71,13 @@ def main(
     except ValueError:
         prompt.error(f"Not supported language: {lang}")
 
-    prompt.instruct(
-        "You can modify language by running the program with -l option. ex: -l ko"
-    )
-    prompt.instruct("➤ Press any key to continue")
+    # Print welcome message using localized resources
+    prompt.box_with_key("init.welcome.title")
+    prompt.instruct_with_key("init.welcome.description")
+    prompt.instruct_with_key("init.welcome.description2")
+    prompt.intense_instruct_with_key("init.welcome.feedback")
+    prompt.instruct_with_key("init.language.modify")
+    prompt.instruct_with_key("init.language.continue")
     prompt.get_key()
 
     from .selector import Selector

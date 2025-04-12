@@ -79,7 +79,7 @@ class Prompt:
             print(Fore.YELLOW + f"Warning: No message found for key '{key}'\n")
 
     def intense_instruct(self, message: str):
-        print(Fore.CYAN + Style.BRIGHT + message)
+        print(Fore.MAGENTA + Style.BRIGHT + message)
 
     def intense_instruct_with_key(self, key: str):
         message = i18n.get(key)

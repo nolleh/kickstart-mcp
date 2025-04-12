@@ -1,5 +1,4 @@
 import csv
-from pathlib import Path
 from typing import Dict, Optional
 import logging
 from importlib.resources import files
@@ -21,12 +20,15 @@ class I18n:
             locale_path = files("data.locales").joinpath(lang)
             for resource in locale_path.iterdir():
                 if resource.name.endswith(".csv"):
-                    with resource.open("r", encoding="utf-8") as f:
-                        reader = csv.DictReader(f)
-                        for row in reader:
-                            self.resources[lang][row["key"]] = row["value"]
+                    try:
+                        with resource.open("r", encoding="utf-8") as f:
+                            reader = csv.DictReader(f)
+                            for row in reader:
+                                self.resources[lang][row["key"]] = row["value"]
+                    except Exception as e:
+                        logger.error(f"Error reading {resource.name}: {e}")
         except Exception as e:
-            print(f"Error loading language {lang}: {e}")
+            logger.error(f"Error loading language {lang}: {e}")
 
     def set_language(self, lang: str):
         """Set current language and load its resources"""
@@ -68,7 +70,7 @@ class I18n:
             locale_path = files("kickstart_mcp.data.locales")
             return [d.name for d in locale_path.iterdir() if d.is_dir()]
         except Exception as e:
-            print(f"Error getting available languages: {e}")
+            logger.error(f"Error getting available languages: {e}")
             return [self.default_lang]
 
 
