@@ -64,7 +64,7 @@ class Prompt:
         print(box_bottom)
 
     def box_with_key(self, key: str):
-        message = i18n.get_text(key)
+        message = i18n.get(key)
         self.box(message)
 
     def instruct(self, message: str):
@@ -72,7 +72,7 @@ class Prompt:
 
     def instruct_with_key(self, key: str):
         """Display instruction from resource key."""
-        message = i18n.get_text(key)
+        message = i18n.get(key)
         if message:
             print(Fore.WHITE + message + "\n")
         else:
@@ -82,7 +82,7 @@ class Prompt:
         print(Fore.CYAN + Style.BRIGHT + message)
 
     def intense_instruct_with_key(self, key: str):
-        message = i18n.get_text(key)
+        message = i18n.get(key)
         self.intense_instruct(message)
 
     def warn(self, message: str):

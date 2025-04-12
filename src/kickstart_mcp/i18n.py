@@ -2,6 +2,7 @@ import csv
 from pathlib import Path
 from typing import Dict, Optional
 import logging
+from importlib.resources import files
 
 logger = logging.getLogger("kickstart-mcp")
 
@@ -10,26 +11,21 @@ class I18n:
         self.current_lang = "en"
         self.resources: Dict[str, Dict[str, str]] = {}
         self.supported_languages = ["en", "ko"]
+        self.default_lang = "en"
 
-    def load_resources(self, lang: str):
+    def load_language(self, lang: str) -> None:
         """Load all CSV resource files for a specific language"""
         self.resources[lang] = {}
-        resource_path = Path(__file__).parent / "locales" / lang
-
-        if not resource_path.exists():
-            raise ValueError(f"Language resources not found: {lang}")
-
-        for csv_file in resource_path.glob("*.csv"):
-            try:
-                with open(csv_file, "r", encoding="utf-8") as f:
-                    reader = csv.DictReader(f)
-                    for row in reader:
-                        key = row["key"]
-                        self.resources[lang][key] = row["value"]
-                logger.debug(f"Loaded resources from {csv_file}")
-            except Exception as e:
-                logger.error(f"Error loading resources from {csv_file}: {e}")
-                raise
+        try:
+            locale_path = files('data.locales').joinpath(lang)
+            for resource in locale_path.iterdir():
+                if resource.name.endswith('.csv'):
+                    with resource.open('r', encoding='utf-8') as f:
+                        reader = csv.DictReader(f)
+                        for row in reader:
+                            self.resources[lang][row["key"]] = row["value"]
+        except Exception as e:
+            print(f"Error loading language {lang}: {e}")
 
     def set_language(self, lang: str):
         """Set current language and load its resources"""
@@ -37,22 +33,38 @@ class I18n:
             raise ValueError(f"Unsupported language: {lang}")
 
         if lang not in self.resources:
-            self.load_resources(lang)
+            self.load_language(lang)
 
         self.current_lang = lang
         logger.info(f"Language set to: {lang}")
 
-    def get_text(self, key: str) -> str:
-        """Get localized text by key"""
-        if self.current_lang not in self.resources:
-            self.load_resources(self.current_lang)
+    def get(self, key: str, lang: Optional[str] = None) -> str:
+        """Get a localized string for a key"""
+        if lang is None:
+            lang = self.default_lang
 
-        return self.resources[self.current_lang].get(key, key)
+        if lang not in self.resources:
+            self.load_language(lang)
+
+        if key in self.resources[lang]:
+            return self.resources[lang][key]
+        elif lang != self.default_lang:
+            # Fallback to default language
+            if self.default_lang not in self.resources:
+                self.load_language(self.default_lang)
+            if key in self.resources[self.default_lang]:
+                return self.resources[self.default_lang][key]
+
+        return key  # Return the key itself if no translation found
 
     def get_available_languages(self) -> list[str]:
         """Get list of available languages by checking directories"""
-        locale_path = Path(__file__).parent / "locales"
-        return [d.name for d in locale_path.iterdir() if d.is_dir() and d.name != "__pycache__"]
+        try:
+            locale_path = files('kickstart_mcp.data.locales')
+            return [d.name for d in locale_path.iterdir() if d.is_dir()]
+        except Exception as e:
+            print(f"Error getting available languages: {e}")
+            return [self.default_lang]
 
 # Create a global instance
 i18n = I18n()
