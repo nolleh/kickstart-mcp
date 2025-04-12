@@ -16,6 +16,7 @@ from .i18n import i18n
 
 logger = logging.getLogger("kickstart-mcp")
 
+
 def load_config(path):
     # Check if the directory exists, if not, create it
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -23,23 +24,34 @@ def load_config(path):
     if not os.path.exists(path):
         # Create the file with default content
         default_content = {}  # You can define default content here
-        with open(path, 'w') as file:
+        with open(path, "w") as file:
             json.dump(default_content, file, indent=4)
-        print(Fore.YELLOW + f"Configuration file not found. Created a new one at {path} with default content.")
+        print(
+            Fore.YELLOW
+            + f"Configuration file not found. Created a new one at {path} with default content."
+        )
     # Load the configuration
-    with open(path, 'r') as file:
+    with open(path, "r") as file:
         return json.load(file)
 
+
 @click.command()
-@click.option("-v", "--verbose", count=True, help="Enable verbose mode. Use -v for INFO, -vv for DEBUG")
-@click.option("--env-file", type=click.Path(exists=True, dir_okay=False), help="Path to .env file")
-@click.option("--mcp-config-file", type=click.Path(dir_okay=False), help="Path to MCP config file")
+@click.option(
+    "-v",
+    "--verbose",
+    count=True,
+    help="Enable verbose mode. Use -v for INFO, -vv for DEBUG",
+)
+@click.option(
+    "--env-file", type=click.Path(exists=True, dir_okay=False), help="Path to .env file"
+)
+@click.option(
+    "--mcp-config-file", type=click.Path(dir_okay=False), help="Path to MCP config file"
+)
 @click.option("--lang", "-l", default="en", help="Language for the tutorial (en/ko)")
 def main(
-    verbose: bool,
-    env_file: str | None,
-    mcp_config_file: str | None,
-    lang: str) -> None:
+    verbose: bool, env_file: str | None, mcp_config_file: str | None, lang: str
+) -> None:
 
     logging_level = logging.INFO
     if verbose == 1:
@@ -58,7 +70,7 @@ def main(
     box_side = Fore.CYAN + Style.BRIGHT + "║"
     #
     # Center the welcome message
-    welcome_message = "Welcome to the kickstart-mcp."
+    welcome_message = "Welcome to the kickstart-mcp"
     centered_message = welcome_message.center(box_width)
     #
     # # Print the welcome message in a box
@@ -69,21 +81,37 @@ def main(
     print(box_bottom)
 
     # Print additional welcome message
-    print(Fore.WHITE + "\nLearn Model Context Protocol (MCP) through interactive tutorials!")
-    print(Fore.WHITE + "From setting up MCP hosts to building your own servers and clients,")
+    print(
+        Fore.WHITE
+        + "\nLearn Model Context Protocol (MCP) through interactive tutorials!"
+    )
+    print(
+        Fore.WHITE
+        + "From setting up MCP hosts to building your own servers and clients,"
+    )
     print(Fore.WHITE + "we'll guide you through every step of your MCP journey.\n")
-    print(Fore.YELLOW + "Have feedback? Visit: https://github.com/nolleh/kickstart-mcp\n")
-
-    # Set the language in i18n
-    i18n.set_language(lang)
+    print(
+        Fore.YELLOW + "Have feedback? Visit: https://github.com/nolleh/kickstart-mcp\n"
+    )
 
     prompt = Prompt()
+    try:
+        # Set the language in i18n
+        i18n.set_language(lang)
+    except ValueError:
+        prompt.error(f"Not supported language: {lang}")
+
+    prompt.instruct(
+        "You can modify language by running the program with -l option. ex: -l ko"
+    )
     prompt.instruct("➤ Press any key to continue")
     prompt.get_key()
 
     from .selector import Selector
+
     selector = Selector()
     selector.select()
+
 
 __all__ = ["i18n"]
 

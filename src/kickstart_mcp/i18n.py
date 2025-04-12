@@ -6,9 +6,10 @@ from importlib.resources import files
 
 logger = logging.getLogger("kickstart-mcp")
 
+
 class I18n:
     def __init__(self):
-        self.current_lang = "en"
+        self.current_lang = None
         self.resources: Dict[str, Dict[str, str]] = {}
         self.supported_languages = ["en", "ko"]
         self.default_lang = "en"
@@ -17,10 +18,10 @@ class I18n:
         """Load all CSV resource files for a specific language"""
         self.resources[lang] = {}
         try:
-            locale_path = files('data.locales').joinpath(lang)
+            locale_path = files("data.locales").joinpath(lang)
             for resource in locale_path.iterdir():
-                if resource.name.endswith('.csv'):
-                    with resource.open('r', encoding='utf-8') as f:
+                if resource.name.endswith(".csv"):
+                    with resource.open("r", encoding="utf-8") as f:
                         reader = csv.DictReader(f)
                         for row in reader:
                             self.resources[lang][row["key"]] = row["value"]
@@ -40,8 +41,12 @@ class I18n:
 
     def get(self, key: str, lang: Optional[str] = None) -> str:
         """Get a localized string for a key"""
+        logger.debug(f"get message for key: {key}, lang: {lang}")
         if lang is None:
-            lang = self.default_lang
+            if self.current_lang is not None:
+                lang = self.current_lang
+            else:
+                lang = self.default_lang
 
         if lang not in self.resources:
             self.load_language(lang)
@@ -60,11 +65,12 @@ class I18n:
     def get_available_languages(self) -> list[str]:
         """Get list of available languages by checking directories"""
         try:
-            locale_path = files('kickstart_mcp.data.locales')
+            locale_path = files("kickstart_mcp.data.locales")
             return [d.name for d in locale_path.iterdir() if d.is_dir()]
         except Exception as e:
             print(f"Error getting available languages: {e}")
             return [self.default_lang]
+
 
 # Create a global instance
 i18n = I18n()
