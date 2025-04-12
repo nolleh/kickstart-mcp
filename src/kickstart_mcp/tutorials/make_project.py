@@ -2,6 +2,7 @@ import subprocess
 from ..utils import Prompt
 import subprocess
 import os
+from ..i18n import i18n
 
 class MakingProject:
     def __init__(self):
@@ -9,16 +10,16 @@ class MakingProject:
 
     def run(self) -> bool:
         prompter = Prompt()
-        prompter.box("1. Let's make a project")
+        prompter.box_with_key("make_project.title")
 
-        prompter.instruct("Enter below command to create a new project.")
-        prompter.instruct("➤ hatch new mcp-weather")
-      
+        prompter.instruct_with_key("make_project.instruction")
+        prompter.instruct_with_key("make_project.command")
+
         while True:
-            command = prompter.read("Enter the command: ")
+            command = prompter.read(i18n.get("make_project.prompt"))
             if command == "hatch new mcp-weather":
                 break
-            prompter.warn("Invalid command. Please try again.")
+            prompter.warn(i18n.get("make_project.invalid_command"))
 
         try:
             if self.check():
@@ -30,6 +31,3 @@ class MakingProject:
 
     def check(self) -> bool:
         return os.path.isdir("mcp-weather")
-        
-
-

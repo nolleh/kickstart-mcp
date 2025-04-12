@@ -24,6 +24,13 @@ For package manager, recommend for using UV
 brew install uv
 ```
 
+In instruction, used hatch to build tool. So follow the instruction, need to install hatch.
+
+```bash
+brew install hatch
+```
+
+
 ## Installation
 
 ### Quick Start (Recommended)

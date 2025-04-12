@@ -1,0 +1,6 @@
+key,value
+make_project.title,"1. Let's make a project"
+make_project.instruction,"Enter below command to create a new project. (hatch command should be installed beforehand. \n If you are using brew, brew install hatch)"
+make_project.command,"➤ hatch new mcp-weather"
+make_project.prompt,"Enter the command:"
+make_project.invalid_command,"Invalid command. Please try again."
