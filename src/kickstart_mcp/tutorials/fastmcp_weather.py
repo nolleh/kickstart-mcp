@@ -45,18 +45,18 @@ class FastMcpWeather(TutorialBase):
 
     def step1(self):
         self.prompter.clear()
-        self.prompter.box_with_key("weather.step1.title")
-        self.prompter.instruct_with_key("weather.step1.intro1")
-        self.prompter.instruct_with_key("weather.step1.intro2")
-        self.prompter.instruct_with_key("weather.step1.intro3")
-        self.prompter.instruct_with_key("weather.step1.benefits.title")
-        self.prompter.instruct_with_key("weather.step1.benefits.1")
-        self.prompter.instruct_with_key("weather.step1.benefits.2")
-        self.prompter.instruct_with_key("weather.step1.benefits.3")
-        self.prompter.instruct_with_key("weather.step1.benefits.4")
-        self.prompter.instruct_with_key("weather.step1.intro4")
+        self.prompter.box_with_key("fastmcp_weather.step1.title")
+        self.prompter.instruct_with_key("fastmcp_weather.step1.intro1")
+        self.prompter.instruct_with_key("fastmcp_weather.step1.intro2")
+        self.prompter.instruct_with_key("fastmcp_weather.step1.intro3")
+        self.prompter.instruct_with_key("fastmcp_weather.step1.benefits.title")
+        self.prompter.instruct_with_key("fastmcp_weather.step1.benefits.1")
+        self.prompter.instruct_with_key("fastmcp_weather.step1.benefits.2")
+        self.prompter.instruct_with_key("fastmcp_weather.step1.benefits.3")
+        self.prompter.instruct_with_key("fastmcp_weather.step1.benefits.4")
+        self.prompter.instruct_with_key("fastmcp_weather.step1.intro4")
 
-        self.prompter.instruct_with_key("weather.step1.dependencies")
+        self.prompter.instruct_with_key("fastmcp_weather.step1.dependencies")
         self.prompter.snippet(
             """[project]
 dependencies = [
@@ -68,7 +68,7 @@ dependencies = [
 ]"""
         )
 
-        self.prompter.instruct_with_key("weather.step1.setup")
+        self.prompter.instruct_with_key("fastmcp_weather.step1.setup")
         self.prompter.snippet(
             """from fastmcp import FastMCP, Context
 from starlette.applications import Starlette
@@ -87,7 +87,7 @@ mcp = FastMCP(
 )"""
         )
 
-        self.prompter.intense_instruct_with_key("weather.step1.lifespan")
+        self.prompter.intense_instruct_with_key("fastmcp_weather.step1.lifespan")
         self.prompter.snippet(
             """
 from contextlib import asynccontextmanager
@@ -103,7 +103,7 @@ async def server_lifespan(server: FastMCP) -> AsyncIterator[str]:
         pass"""
         )
 
-        self.prompter.instruct_with_key("weather.step1.existing")
+        self.prompter.instruct_with_key("fastmcp_weather.step1.existing")
         self.prompter.snippet(
             '''
 async def make_nws_request(url: str) -> dict[str, Any] | None:
@@ -135,13 +135,13 @@ Instructions: {props.get('instruction', 'No specific instructions provided')}
 
     def step2(self):
         self.prompter.clear()
-        self.prompter.box_with_key("weather.step2.title")
-        self.prompter.instruct_with_key("weather.step2.intro1")
-        self.prompter.instruct_with_key("weather.step2.intro2")
+        self.prompter.box_with_key("fastmcp_weather.step2.title")
+        self.prompter.instruct_with_key("fastmcp_weather.step2.intro1")
+        self.prompter.instruct_with_key("fastmcp_weather.step2.intro2")
 
-        self.prompter.instruct_with_key("weather.step2.tools")
-        self.prompter.instruct_with_key("weather.step2.modify")
-        self.prompter.instruct_with_key("weather.step2.automatic")
+        self.prompter.instruct_with_key("fastmcp_weather.step2.tools")
+        self.prompter.instruct_with_key("fastmcp_weather.step2.modify")
+        self.prompter.instruct_with_key("fastmcp_weather.step2.automatic")
         self.prompter.snippet(
             '''@mcp.tool()
 async def get_alerts(state: str, ctx: Context) -> str:
@@ -204,7 +204,7 @@ Forecast: {period['detailedForecast']}
     return "\\n--\\n".join(forecasts)'''
         )
 
-        self.prompter.instruct_with_key("weather.step2.main")
+        self.prompter.instruct_with_key("fastmcp_weather.step2.main")
         self.prompter.snippet(
             '''
 async def run_sse(port: int = 9009) -> None:
