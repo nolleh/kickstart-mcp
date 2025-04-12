@@ -41,26 +41,48 @@ class I18n:
         self.current_lang = lang
         logger.info(f"Language set to: {lang}")
 
-    def get(self, key: str, lang: Optional[str] = None) -> str:
-        """Get a localized string for a key"""
-        logger.debug(f"get message for key: {key}, lang: {lang}")
-        if lang is None:
-            if self.current_lang is not None:
-                lang = self.current_lang
-            else:
-                lang = self.default_lang
+    def get(self, key: str, *args) -> str:
+        """Get a localized string for a key
+
+        Args:
+            key: The translation key to look up
+            lang: Optional language code. If not provided, uses current_lang or default_lang
+            *args: Variable positional arguments for string formatting
+
+        Returns:
+            The translated and formatted string, or the key if not found
+        """
+        if self.current_lang is not None:
+            lang = self.current_lang
+        else:
+            lang = self.default_lang
 
         if lang not in self.resources:
             self.load_language(lang)
 
         if key in self.resources[lang]:
-            return self.resources[lang][key]
+            text = self.resources[lang][key]
+            try:
+                # Only format if args are provided
+                if args:
+                    return text.format(*args)
+                return text
+            except Exception as e:
+                logger.error(f"Error formatting text for key {key} with args {args}: {e}")
+                return text
         elif lang != self.default_lang:
             # Fallback to default language
             if self.default_lang not in self.resources:
                 self.load_language(self.default_lang)
             if key in self.resources[self.default_lang]:
-                return self.resources[self.default_lang][key]
+                text = self.resources[self.default_lang][key]
+                try:
+                    if args:
+                        return text.format(*args)
+                    return text
+                except Exception as e:
+                    logger.error(f"Error formatting text for key {key} with args {args}: {e}")
+                    return text
 
         return key  # Return the key itself if no translation found
 

@@ -51,13 +51,15 @@ path = "src/kickstart_mcp/__about__.py"
 [tool.hatch.build.targets.wheel]
 packages = ["src/kickstart_mcp"]
 include = [
-    "data/locales/**/*",  # Include all files in locales directory
+    "data/**/*.csv",  # Include all CSV files in data directory
+    # "data/locales/**/*",  # Include all files in locales directory
 ]
 
 [tool.hatch.build.targets.sdist]
 include = [
     "/src/kickstart_mcp",
-    "/data/locales/**/*",  # Include all locale files
+    "/data/**/*.csv",  # Include all CSV files
+    # "/data/locales/**/*",  # Include all locale files
 ]
 
 [tool.hatch.build.targets.wheel.force-include]

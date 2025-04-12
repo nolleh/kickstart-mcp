@@ -6,6 +6,7 @@ from ..config import Config
 import platform
 from colorama import Fore, Style
 import subprocess
+from ..i18n import i18n
 
 class HelloMcp(TutorialBase):
     def __init__(self):
@@ -46,24 +47,16 @@ class HelloMcp(TutorialBase):
 
     def step1(self):
         self.prompter.clear()
-        self.prompter.box("Step 1: Create MCP Configuration File")
-        self.prompter.instruct(
-            "\nWelcome to the HelloMcp tutorial! We'll help you set up Model Context Protocol (MCP) with your preferred host."
-        )
-        self.prompter.instruct(
-            "\nFirst, let's create a basic MCP configuration file. This file will be used to configure MCP for your chosen host."
-        )
-        self.prompter.instruct(
-            "\nThe configuration file will be created at the following location based on your operating system:"
-        )
+        self.prompter.box_with_key("hello_mcp.step1.title")
+        self.prompter.instruct_with_key("hello_mcp.step1.welcome")
+        self.prompter.instruct_with_key("hello_mcp.step1.intro")
+        self.prompter.instruct_with_key("hello_mcp.step1.location")
 
         self.prompter.snippet(
             f"""# For {self.os_type}:
 {self.target_file}"""
         )
-        self.prompter.instruct(
-            "\nLet's create a basic configuration file structure:"
-        )
+        self.prompter.instruct_with_key("hello_mcp.step1.structure")
         self.prompter.snippet(
             """{
     "mcpServers": {}
@@ -72,13 +65,9 @@ class HelloMcp(TutorialBase):
 
     def step2(self):
         self.prompter.clear()
-        self.prompter.box("Step 2: Configure MCP Servers")
-        self.prompter.instruct(
-            "\nNow that we have our basic configuration file, let's add the filesystem server to enable file operations."
-        )
-        self.prompter.instruct(
-            "\nUpdate your configuration file with the following content:"
-        )
+        self.prompter.box_with_key("hello_mcp.step2.title")
+        self.prompter.instruct_with_key("hello_mcp.step2.intro")
+        self.prompter.instruct_with_key("hello_mcp.step2.update")
         self.prompter.snippet(
             """{
     "mcpServers": {
@@ -94,79 +83,55 @@ class HelloMcp(TutorialBase):
     }
 }"""
         )
-        self.prompter.intense_instruct(
-            "Remember to replace 'username' with your actual username"
-        )
-        self.prompter.instruct(
-            "\nThis configuration enables the filesystem server, which allows MCP to interact with your files."
-        )
+        self.prompter.intense_instruct_with_key("hello_mcp.step2.reminder")
+        self.prompter.instruct_with_key("hello_mcp.step2.explanation")
 
     def step3(self):
         self.prompter.clear()
-        self.prompter.box("Step 3: Install Required Dependencies")
-        self.prompter.instruct(
-            "\nTo use the filesystem server, we need to install Node.js and the required npm package."
-        )
-        self.prompter.instruct(
-            "\nFirst, ensure you have Node.js installed. Then run:"
-        )
+        self.prompter.box_with_key("hello_mcp.step3.title")
+        self.prompter.instruct_with_key("hello_mcp.step3.intro")
+        self.prompter.instruct_with_key("hello_mcp.step3.instruction")
         self.prompter.snippet(
             """node --version"""
         )
-        self.prompter.instruct(
-            "\nAfter installation, restart your application to apply the changes."
-        )
-        self.prompter.instruct(
-            "\nYou should now see the hammer icon (🔨) in the bottom right corner of the input box."
-        )
+        self.prompter.instruct_with_key("hello_mcp.step3.restart")
+        self.prompter.instruct_with_key("hello_mcp.step3.completion")
 
     def run(self) -> bool:
         """Run the tutorial"""
         self.prompter.clear()
-        self.prompter.box("Welcome to HelloMcp Tutorial")
-        
+        self.prompter.box_with_key("hello_mcp.title")
+
         # Introduction to MCP
-        self.prompter.instruct(
-            "\nModel Context Protocol (MCP) is an open protocol that standardizes how applications provide context to LLMs."
-        )
-        self.prompter.instruct(
-            "Think of MCP like a USB-C port for AI applications - it provides a standardized way to connect AI models to different data sources and tools."
-        )
-        self.prompter.instruct(
-            "\nMCP helps you build agents and complex workflows on top of LLMs by providing:"
-        )
-        self.prompter.instruct("• Pre-built integrations that your LLM can directly plug into")
-        self.prompter.instruct("• Flexibility to switch between LLM providers and vendors")
-        self.prompter.instruct("• Best practices for securing your data within your infrastructure")
-        
-        self.prompter.instruct(
-            "\nFor more detailed information about MCP, please check the tutorial description at:"
-        )
+        self.prompter.instruct_with_key("hello_mcp.intro1")
+        self.prompter.instruct_with_key("hello_mcp.intro2")
+        self.prompter.instruct_with_key("hello_mcp.intro3")
+        self.prompter.instruct_with_key("hello_mcp.feature1")
+        self.prompter.instruct_with_key("hello_mcp.feature2")
+        self.prompter.instruct_with_key("hello_mcp.feature3")
+
+        self.prompter.instruct_with_key("hello_mcp.more_info")
         self.prompter.instruct("docs/tutorials/description/hello_mcp.md")
-        
-        self.prompter.instruct(
-            "\nNow, let's choose your MCP host. The host is the application that will use MCP to interact with various tools and data sources."
-        )
-        self.prompter.instruct(
-            "\nAvailable options:"
-        )
-        print(Fore.YELLOW + Style.BRIGHT + "➤ 1. Claude Desktop - Anthropic's AI assistant with MCP support")
-        print(Fore.YELLOW + Style.BRIGHT + "➤ 2. Cursor - AI-powered code editor with MCP integration")
-        print(Fore.YELLOW + Style.BRIGHT + "➤ 3. Custom - Set up MCP for your own application")
-        
-        choice = input(Fore.GREEN + "\nEnter the number of your choice: ").strip()
-        
+
+        self.prompter.instruct_with_key("hello_mcp.choose_host")
+        self.prompter.instruct_with_key("hello_mcp.available_options")
+        print(Fore.YELLOW + Style.BRIGHT + i18n.get("hello_mcp.option1"))
+        print(Fore.YELLOW + Style.BRIGHT + i18n.get("hello_mcp.option2"))
+        print(Fore.YELLOW + Style.BRIGHT + i18n.get("hello_mcp.option3"))
+
+        choice = input(Fore.GREEN + i18n.get("hello_mcp.enter_choice") + " ").strip()
+
         if choice == '1':
             self.target_file = self.config.claude_config_map[self.os_type]
-            self.prompter.instruct("\nGreat choice! We'll set up MCP for Claude Desktop.")
+            self.prompter.instruct_with_key("hello_mcp.choice1")
         elif choice == '2':
             self.target_file = self.config.cursor_config_map[self.os_type]
-            self.prompter.instruct("\nExcellent! We'll configure MCP for Cursor.")
+            self.prompter.instruct_with_key("hello_mcp.choice2")
         elif choice == '3':
             self.target_file = self.config.custom_config_map[self.os_type]
-            self.prompter.instruct("\nPerfect! We'll set up a custom MCP configuration.")
+            self.prompter.instruct_with_key("hello_mcp.choice3")
         else:
-            print(Fore.RED + "Invalid choice. Please select 1, 2, or 3.")
+            print(Fore.RED + i18n.get("hello_mcp.invalid_choice"))
             return False
 
         while self.current_step <= self.total_steps:
@@ -175,10 +140,10 @@ class HelloMcp(TutorialBase):
                     return False
             else:
                 self.prompter.intense_instruct(
-                    f"You've completed step {self.current_step}!"
+                    i18n.get("hello_mcp.step_complete", str(self.current_step))
                 )
                 self.current_step += 1
-            self.prompter.instruct("➤ Press any key to continue")
+            self.prompter.instruct_with_key("hello_mcp.press_continue")
             self.prompter.get_key()
 
-        return True 
+        return True
