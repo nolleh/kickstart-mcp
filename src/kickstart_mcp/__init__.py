@@ -12,6 +12,7 @@ import logging
 import click
 from dotenv import load_dotenv
 from .utils import Prompt
+from .i18n import i18n
 
 logger = logging.getLogger("kickstart-mcp")
 
@@ -33,16 +34,18 @@ def load_config(path):
 @click.option("-v", "--verbose", count=True, help="Enable verbose mode. Use -v for INFO, -vv for DEBUG")
 @click.option("--env-file", type=click.Path(exists=True, dir_okay=False), help="Path to .env file")
 @click.option("--mcp-config-file", type=click.Path(dir_okay=False), help="Path to MCP config file")
+@click.option("--lang", "-l", default="en", help="Language for the tutorial (en/ko)")
 def main(
     verbose: bool,
-    env_file: str | None, 
-    mcp_config_file: str | None) -> None:
+    env_file: str | None,
+    mcp_config_file: str | None,
+    lang: str) -> None:
 
     logging_level = logging.INFO
     if verbose == 1:
         logging_level = logging.INFO
     elif verbose >= 2:
-        logging_level = logging.DEBUG  
+        logging_level = logging.DEBUG
 
     logging.basicConfig(level=logging_level)
 
@@ -71,6 +74,9 @@ def main(
     print(Fore.WHITE + "we'll guide you through every step of your MCP journey.\n")
     print(Fore.YELLOW + "Have feedback? Visit: https://github.com/nolleh/kickstart-mcp\n")
 
+    # Set the language in i18n
+    i18n.set_language(lang)
+
     prompt = Prompt()
     prompt.instruct("➤ Press any key to continue")
     prompt.get_key()
@@ -78,6 +84,8 @@ def main(
     from .selector import Selector
     selector = Selector()
     selector.select()
+
+__all__ = ["i18n"]
 
 if __name__ == "__main__":
     main()

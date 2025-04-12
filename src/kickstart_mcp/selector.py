@@ -4,14 +4,11 @@ import inspect
 import sys
 import tty
 import termios
-from typing import List 
+from typing import List
 from .utils import Prompt
 from .state import TutorialState
 import traceback
-import time
 from colorama import Fore,Style
-from .tutorials.modify_toml import ModifyToml
-from .tutorials.modify_init import ModifyInit
 
 class Tutorial:
     def __init__(self, name: str, description: str, module: str):
@@ -24,7 +21,7 @@ class Selector:
         self.tutorials: List[Tutorial] = []
         self.state = TutorialState()
         self.current_position = 0
-        self.current_group = "python-project" 
+        self.current_group = "python-project"
         self.prompter = Prompt()
         self._load_tutorials()
         # Restore last position and group if exists
@@ -38,29 +35,29 @@ class Selector:
     def _load_tutorials(self):
         """Load all tutorial modules from the tutorials directory"""
         tutorials_dir = os.path.join(os.path.dirname(__file__), "tutorials")
-        
+
         # Get all Python files in the tutorials directory
-        tutorial_files = [f for f in os.listdir(tutorials_dir) 
+        tutorial_files = [f for f in os.listdir(tutorials_dir)
                          if f.endswith('.py') and not f.startswith('__')]
-        
+
         # Sort files to ensure consistent order
         tutorial_files.sort()
-        
+
         for file in tutorial_files:
             # Import the module
             module_name = f"kickstart_mcp.tutorials.{file[:-3]}"
             try:
                 module = importlib.import_module(module_name)
-                
+
                 # Find the tutorial class in the module
                 for name, obj in inspect.getmembers(module):
-                    if (inspect.isclass(obj) and 
-                        name not in ['Tutorial', 'Selector'] and 
+                    if (inspect.isclass(obj) and
+                        name not in ['Tutorial', 'Selector'] and
                         hasattr(obj, 'run')):
-                        
+
                         # Get description from docstring or use default
                         description = getattr(obj, '__doc__', '') or f"Tutorial {name}"
-                        
+
                         self.tutorials.append(Tutorial(
                             name=name,
                             description=description,
@@ -87,7 +84,7 @@ class Selector:
         """Display overall progress and group progress"""
         total_progress = self.state.get_total_progress()
         self.prompter.instruct(self.prompter.format_progress("Overall Progress", total_progress))
-        
+
         if self.current_group:
             group_progress = self.state.get_group_progress(self.current_group)
             group_name = self.state.groups[self.current_group].name
@@ -97,10 +94,10 @@ class Selector:
         """Display available tutorials with their descriptions"""
         # Clear screen and move cursor to top
         self.prompter.clear()
-        
+
         # Display title
         self.prompter.box("Available Tutorials")
-        
+
         # Display groups
         for group_name, group in self.state.groups.items():
             # Add group header with progress
@@ -108,7 +105,7 @@ class Selector:
             cursor = ">" if group_name == self.current_group else " "
             self.prompter.instruct(f"\n{cursor} {group.name} ({progress:.1%})")
             self.prompter.instruct(f"   {group.description}")
-            
+
             # Display tutorials in this group
             if group_name == self.current_group:
                 for i, tutorial_name in enumerate(group.tutorials):
@@ -125,7 +122,7 @@ class Selector:
                                 is_selected=(i == self.current_position)
                             )
                         )
-        
+
         self.prompter.instruct("\nUse "+ Fore.YELLOW + "↑↓→←" + Style.RESET_ALL + " to navigate, Enter to select, 'q' to quit")
         self._display_progress()
 
@@ -146,14 +143,14 @@ class Selector:
         try:
             while True:
                 self._display_tutorials()
-                
+
                 # Get keypress
                 key = self._get_key()
 
                 def move_cursor(key: str | None, direction: str | None):
                     """Move cursor up or down"""
                     if direction == 'A' or key == 'k':
-                        if self.current_group: 
+                        if self.current_group:
                             group = self.state.groups[self.current_group]
                             if len(group.tutorials) > 0:
                                 self.current_position = (self.current_position - 1) % len(group.tutorials)
@@ -182,7 +179,7 @@ class Selector:
                                 self.current_position = 0
                         else:
                             self.current_group = group_names[-1]
-                
+
                 move_cursor(key, None)
 
                 if key == 'q':
@@ -197,7 +194,7 @@ class Selector:
                                 self.state.set_current_tutorial(tutorial.name)
                                 if self._run_tutorial(tutorial):
                                     self.state.mark_tutorial_completed(tutorial.name)
-                                self.prompter.instruct("➤ Press any key") 
+                                self.prompter.instruct("➤ Press any key")
                                 self._get_key()
                                 self.select()
                                 return True
@@ -210,7 +207,7 @@ class Selector:
 
                         # Animate selection change
                         self._animate_selection_change(old_pos, self.current_position)
-                
+
                 # Save current position and group
                 self.state.set_last_position(self.current_position)
                 if self.current_group:
@@ -224,19 +221,18 @@ class Selector:
         try:
             # Import the module
             module = importlib.import_module(tutorial.module)
-            
+
             # Find and instantiate the tutorial class
             for name, obj in inspect.getmembers(module):
-                if (inspect.isclass(obj) and 
-                    name == tutorial.name and 
+                if (inspect.isclass(obj) and
+                    name == tutorial.name and
                     hasattr(obj, 'run')):
-                    
+
                     # Create instance and run main method
                     instance = obj()
                     return instance.run()
                     # time.sleep(3)
-                    
+
 
         except Exception:
             print(f"Error running tutorial {tutorial.name}:", traceback.format_exc())
-

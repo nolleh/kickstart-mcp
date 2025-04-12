@@ -5,9 +5,9 @@ from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import TerminalFormatter
 import sys
-import tty
-import termios
 import pyperclip
+from typing import Optional
+from .i18n import i18n
 
 
 class Theme:
@@ -37,61 +37,68 @@ class Theme:
 class Prompt:
     def __init__(self):
         # Initialize colorama with explicit settings
-        init()
+        init(autoreset=True)
         self.theme = Theme()
         self.clear_screen = "\033[2J"  # Clear screen
         self.move_cursor = "\033[H"  # Move cursor to top-left
         self.hide_cursor = "\033[?25l"  # Hide cursor
         self.show_cursor = "\033[?25h"  # Show cursor
         self.terminal_width = os.get_terminal_size().columns
+        self.box_width = 40
 
     def clear(self):
         """Clear the screen and move cursor to top"""
-        print(self.clear_screen + self.move_cursor, end="", flush=True)
+        os.system("cls" if os.name == "nt" else "clear")
 
-    def box(self, text: str):
-        """Display text in a fancy box"""
-        # Calculate box width (minimum 40 characters)
-        box_width = 40
-        box_top = Fore.CYAN + Style.BRIGHT + "╔" + "═" * box_width + "╗"
-        box_bottom = Fore.CYAN + Style.BRIGHT + "╚" + "═" * box_width + "╝"
+    def box(self, title: str):
+        box_top = Fore.CYAN + Style.BRIGHT + "╔" + "═" * self.box_width + "╗"
+        box_bottom = Fore.CYAN + Style.BRIGHT + "╚" + "═" * self.box_width + "╝"
         box_side = Fore.CYAN + Style.BRIGHT + "║"
 
-        # Center the welcome message
-        centered_message = text.center(box_width)
+        centered_title = title.center(self.box_width)
 
-        # Print the welcome message in a box
         print(box_top)
-        print(box_side + " " * box_width + box_side)
-        print(box_side + centered_message + box_side)
-        print(box_side + " " * box_width + box_side)
+        print(box_side + " " * self.box_width + box_side)
+        print(box_side + centered_title + box_side)
+        print(box_side + " " * self.box_width + box_side)
         print(box_bottom)
 
-    def instruct(self, text: str, color: str = Fore.WHITE):
-        """Display instruction text"""
-        print(color + text + self.theme.reset)
+    def box_with_key(self, key: str):
+        message = i18n.get_text(key)
+        self.box(message)
 
-    def intense_instruct(self, text: str):
-        """Display intense instruction text"""
-        print(self.theme.intense_text + text + self.theme.reset)
+    def instruct(self, message: str):
+        print(Fore.WHITE + message)
 
-    def warn(self, text: str):
-        """Display warning text"""
-        print(self.theme.warning_color + text + self.theme.reset)
+    def instruct_with_key(self, key: str):
+        """Display instruction from resource key."""
+        message = i18n.get_text(key)
+        if message:
+            print(Fore.WHITE + message + "\n")
+        else:
+            print(Fore.YELLOW + f"Warning: No message found for key '{key}'\n")
 
-    def error(self, text: str):
-        """Display error text"""
-        print(self.theme.error_color + text + self.theme.reset)
+    def intense_instruct(self, message: str):
+        print(Fore.CYAN + Style.BRIGHT + message)
 
-    def success(self, text: str):
-        """Display success text"""
-        print(self.theme.success_color + text + self.theme.reset)
+    def intense_instruct_with_key(self, key: str):
+        message = i18n.get_text(key)
+        self.intense_instruct(message)
+
+    def warn(self, message: str):
+        print(Fore.YELLOW + message)
+
+    def error(self, message: str):
+        print(Fore.RED + message)
+
+    def success(self, message: str):
+        print(Fore.GREEN + message)
 
     def read(self, prompt: str) -> str:
         """Read input from user"""
         return input(self.theme.text_color + prompt + self.theme.reset).strip()
 
-    def snippet(self, text: str, language: str | None = "python", copy: bool = True):
+    def snippet(self, code: str, language: Optional[str] = None, copy: bool = True):
         """Display code snippet with syntax highlighting"""
         try:
             if language is not None:
@@ -99,12 +106,12 @@ class Prompt:
                 lexer = get_lexer_by_name(language)
 
                 # Highlight the code
-                highlighted_text = highlight(text, lexer, TerminalFormatter())
+                highlighted_text = highlight(code, lexer, TerminalFormatter())
 
                 # Split the highlighted code into lines
                 lines = highlighted_text.rstrip().split("\n")
             else:
-                lines = text.rstrip().split("\n")
+                lines = code.rstrip().split("\n")
 
             # Find the longest line length (excluding ANSI codes)
             def strip_ansi(s):
@@ -170,15 +177,16 @@ class Prompt:
                 )
                 key = self.get_key()
                 if key == "c":  # Enter key
-                    pyperclip.copy(text)
+                    pyperclip.copy(code)
                     print(
                         f"{self.theme.success_color}Code copied to clipboard!{self.theme.reset}"
                     )
+                print()
 
         except Exception as e:
             # Fallback to non-highlighted version if highlighting fails
             print(f"Warning: Syntax highlighting failed: {e}")
-            # self.snippet(text, language=None)
+            # self.snippet(code, language=None)
 
     def format_tutorial_item(
         self,
@@ -211,24 +219,32 @@ class Prompt:
 
     def get_key(self):
         """Get a single keypress from the user"""
-        fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
-        try:
-            tty.setraw(sys.stdin.fileno())
-            ch = sys.stdin.read(1)
-            if ch == "\x03":  # Ctrl+C
-                raise KeyboardInterrupt
-            elif ch == "\x1b":  # ESC
-                # Read the next two characters for special keys
-                next_ch = sys.stdin.read(2)
-                if next_ch == "[A":  # Up arrow
-                    return "↑"
-                elif next_ch == "[B":  # Down arrow
-                    return "↓"
-                elif next_ch == "[C":  # Right arrow
-                    return "→"
-                elif next_ch == "[D":  # Left arrow
-                    return "←"
-            return ch
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        if os.name == "nt":
+            import msvcrt
+
+            return msvcrt.getch().decode()
+        else:
+            import tty
+            import termios
+
+            fd = sys.stdin.fileno()
+            old_settings = termios.tcgetattr(fd)
+            try:
+                tty.setraw(sys.stdin.fileno())
+                ch = sys.stdin.read(1)
+                if ch == "\x03":  # Ctrl+C
+                    raise KeyboardInterrupt
+                elif ch == "\x1b":  # ESC
+                    # Read the next two characters for special keys
+                    next_ch = sys.stdin.read(2)
+                    if next_ch == "[A":  # Up arrow
+                        return "↑"
+                    elif next_ch == "[B":  # Down arrow
+                        return "↓"
+                    elif next_ch == "[C":  # Right arrow
+                        return "→"
+                    elif next_ch == "[D":  # Left arrow
+                        return "←"
+                return ch
+            finally:
+                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)

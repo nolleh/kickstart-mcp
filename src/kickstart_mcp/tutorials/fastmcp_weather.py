@@ -24,7 +24,7 @@ class FastMcpWeather(TutorialBase):
 
         content = Path(self.target_file).read_text()
         if self.current_step == 1:
-            return "FastMCP" in content and "NWS_API_BASE" in content
+            return "from mcp.server.fastmcp import FastMCP" in content and "NWS_API_BASE" in content
         elif self.current_step == 2:
             return (
                 "get_alerts" in content
@@ -45,32 +45,18 @@ class FastMcpWeather(TutorialBase):
 
     def step1(self):
         self.prompter.clear()
-        self.prompter.box("Step 1: Set Up FastMCP Weather Server")
-        self.prompter.instruct(
-            "\nSo far, we've been implementing MCP servers using the standard approach with decorators like @server.list_tools() and @server.call_tool()."
-        )
-        self.prompter.instruct(
-            "While this is the standard way to create MCP servers, there's a more Pythonic and efficient way using FastMCP."
-        )
-        self.prompter.instruct(
-            "\nFastMCP (https://github.com/jlowin/fastmcp) is a high-level library that makes building MCP servers much simpler."
-        )
-        self.prompter.instruct("Key benefits of FastMCP:")
-        self.prompter.instruct(
-            "1. Less boilerplate code - just decorate your functions with @mcp.tool()"
-        )
-        self.prompter.instruct("2. Built-in input validation and documentation")
-        self.prompter.instruct("3. Automatic dependency management")
-        self.prompter.instruct(
-            "4. Progress reporting and logging through Context object"
-        )
-        self.prompter.instruct(
-            "\nIn this tutorial, we'll rebuild our weather server using FastMCP to see how it simplifies our code."
-        )
+        self.prompter.box_with_key("weather.step1.title")
+        self.prompter.instruct_with_key("weather.step1.intro1")
+        self.prompter.instruct_with_key("weather.step1.intro2")
+        self.prompter.instruct_with_key("weather.step1.intro3")
+        self.prompter.instruct_with_key("weather.step1.benefits.title")
+        self.prompter.instruct_with_key("weather.step1.benefits.1")
+        self.prompter.instruct_with_key("weather.step1.benefits.2")
+        self.prompter.instruct_with_key("weather.step1.benefits.3")
+        self.prompter.instruct_with_key("weather.step1.benefits.4")
+        self.prompter.instruct_with_key("weather.step1.intro4")
 
-        self.prompter.instruct(
-            "\nFirst, let's add the required dependencies to your pyproject.toml:"
-        )
+        self.prompter.instruct_with_key("weather.step1.dependencies")
         self.prompter.snippet(
             """[project]
 dependencies = [
@@ -82,9 +68,7 @@ dependencies = [
 ]"""
         )
 
-        self.prompter.instruct(
-            "\nNow, let's create the FastMCP server with basic setup:"
-        )
+        self.prompter.instruct_with_key("weather.step1.setup")
         self.prompter.snippet(
             """from fastmcp import FastMCP, Context
 from starlette.applications import Starlette
@@ -103,9 +87,7 @@ mcp = FastMCP(
 )"""
         )
 
-        self.prompter.intense_instruct(
-            "The server_lifespan function needs to be kept to maintain context handling in FastMCP initialization"
-        )
+        self.prompter.intense_instruct_with_key("weather.step1.lifespan")
         self.prompter.snippet(
             """
 from contextlib import asynccontextmanager
@@ -121,9 +103,7 @@ async def server_lifespan(server: FastMCP) -> AsyncIterator[str]:
         pass"""
         )
 
-        self.prompter.instruct(
-            "The following code needs to be kept to maintain the existing functionality"
-        )
+        self.prompter.instruct_with_key("weather.step1.existing")
         self.prompter.snippet(
             '''
 async def make_nws_request(url: str) -> dict[str, Any] | None:
@@ -155,21 +135,13 @@ Instructions: {props.get('instruction', 'No specific instructions provided')}
 
     def step2(self):
         self.prompter.clear()
-        self.prompter.box("Step 2: Implement Weather Tools")
-        self.prompter.instruct(
-            "\nNow we'll implement the weather tools using FastMCP's decorators."
-        )
-        self.prompter.instruct(
-            "Notice how we don't need to manually define input schemas or handle tool calls - FastMCP does this for us."
-        )
+        self.prompter.box_with_key("weather.step2.title")
+        self.prompter.instruct_with_key("weather.step2.intro1")
+        self.prompter.instruct_with_key("weather.step2.intro2")
 
-        self.prompter.instruct("\nAdd these tool implementations:")
-        self.prompter.instruct(
-            "If you already have these functions, just modify their decorators. You can now remove the functions that were originally marked with @server.list_tools and @server.call_tool"
-        )
-        self.prompter.instruct(
-            "FastMCP will automatically manage list_tools and call_tool. All you need to do is decorate your functions with '@mcp.tool'"
-        )
+        self.prompter.instruct_with_key("weather.step2.tools")
+        self.prompter.instruct_with_key("weather.step2.modify")
+        self.prompter.instruct_with_key("weather.step2.automatic")
         self.prompter.snippet(
             '''@mcp.tool()
 async def get_alerts(state: str, ctx: Context) -> str:
@@ -202,7 +174,7 @@ async def get_forecast(latitude: float, longitude: float, ctx: Context) -> str:
         ctx: FastMCP context for progress reporting and logging
     """
     ctx.info(f"Fetching forecast for location: {latitude}, {longitude}")
-    
+
     # First get the Forecast grid endpoint
     points_url = f"{NWS_API_BASE}/points/{latitude},{longitude}"
     points_data = await make_nws_request(points_url)
@@ -232,7 +204,7 @@ Forecast: {period['detailedForecast']}
     return "\\n--\\n".join(forecasts)'''
         )
 
-        self.prompter.instruct("Now, let's modify the main function to support both SSE and stdio:")
+        self.prompter.instruct_with_key("weather.step2.main")
         self.prompter.snippet(
             '''
 async def run_sse(port: int = 9009) -> None:
