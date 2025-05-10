@@ -24,7 +24,10 @@ class FastMcpWeather(TutorialBase):
 
         content = Path(self.target_file).read_text()
         if self.current_step == 1:
-            return "from mcp.server.fastmcp import FastMCP" in content and "NWS_API_BASE" in content
+            return (
+                "from mcp.server.fastmcp import FastMCP" in content
+                and "NWS_API_BASE" in content
+            )
         elif self.current_step == 2:
             return (
                 "get_alerts" in content
@@ -62,7 +65,6 @@ class FastMcpWeather(TutorialBase):
 dependencies = [
     "mcp[cli]",
     "httpx",
-    "pydantic",
     "starlette>=0.27.0",
     "uvicorn>=0.24.0"
 ]"""
@@ -70,10 +72,12 @@ dependencies = [
 
         self.prompter.instruct_with_key("fastmcp_weather.step1.setup")
         self.prompter.snippet(
-            """from fastmcp import FastMCP, Context
+            """from mcp.server.fastmcp import FastMCP, Context
 from starlette.applications import Starlette
 from starlette.routing import Mount
 import uvicorn
+import httpx
+from typing import Any
 
 # Constants for the National Weather Service API
 NWS_API_BASE = "https://api.weather.gov"
