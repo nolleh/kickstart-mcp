@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "kickstart-mcp"
 dynamic = ["version"]
-description = ''
+description = "Kickstart-mcp is tutorial for using mcp, making your own mcp server/client. We'll guide you through every step of your MCP journey"
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"

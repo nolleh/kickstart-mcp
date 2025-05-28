@@ -46,6 +46,8 @@ class Prompt:
         self.show_cursor = "\033[?25h"  # Show cursor
         self.terminal_width = os.get_terminal_size().columns
         self.box_width = 40
+        self.horizontal_margin = 2  # Number of spaces for left/right margin
+        self.vertical_margin = 0    # Number of empty lines for top/bottom margin
 
     def _get_display_width(self, text: str) -> int:
         """Calculate the display width of text, accounting for multi-byte characters."""
@@ -69,6 +71,17 @@ class Prompt:
 
         return " " * left_padding + text + " " * right_padding
 
+    def _add_horizontal_margin(self, text: str) -> str:
+        return " " * self.horizontal_margin + text + " " * self.horizontal_margin
+
+    def _print_with_margin(self, lines):
+        for _ in range(self.vertical_margin):
+            print()
+        for line in lines:
+            print(self._add_horizontal_margin(line))
+        for _ in range(self.vertical_margin):
+            print()
+
     def clear(self):
         """Clear the screen and move cursor to top"""
         os.system("cls" if os.name == "nt" else "clear")
@@ -80,36 +93,39 @@ class Prompt:
 
         centered_title = self._center_text(title, self.box_width)
 
-        print(box_top)
-        print(box_side + " " * self.box_width + box_side)
-        print(box_side + centered_title + box_side)
-        print(box_side + " " * self.box_width + box_side)
-        print(box_bottom)
+        lines = [
+            box_top,
+            box_side + " " * self.box_width + box_side,
+            box_side + centered_title + box_side,
+            box_side + " " * self.box_width + box_side,
+            box_bottom,
+        ]
+        self._print_with_margin(lines)
 
     def box_with_key(self, key: str):
         message = i18n.get(key)
         self.box(message)
 
     def instruct(self, message: str):
-        print(Fore.WHITE + message)
+        self._print_with_margin([Fore.WHITE + message])
 
     def instruct_with_key(self, key: str):
         """Display instruction from resource key."""
         message = i18n.get(key)
         if message:
-            print(Fore.WHITE + message + "\n")
+            self._print_with_margin([Fore.WHITE + message + "\n"])
         else:
-            print(Fore.YELLOW + f"Warning: No message found for key '{key}'\n")
+            self._print_with_margin([Fore.YELLOW + f"Warning: No message found for key '{key}'\n"])
 
     def intense_instruct(self, message: str):
-        print(Fore.MAGENTA + Style.BRIGHT + message)
+        self._print_with_margin([Fore.MAGENTA + Style.BRIGHT + message])
 
     def intense_instruct_with_key(self, key: str, *args):
         message = i18n.get(key, *args)
         self.intense_instruct(message)
 
     def warn(self, message: str):
-        print(Fore.YELLOW + message)
+        self._print_with_margin([Fore.YELLOW + message])
 
     def warn_with_key(self, key: str):
         message = i18n.get(key)
@@ -120,10 +136,10 @@ class Prompt:
         self.error(message)
 
     def error(self, message: str):
-        print(Fore.RED + message)
+        self._print_with_margin([Fore.RED + message])
 
     def success(self, message: str):
-        print(Fore.GREEN + message)
+        self._print_with_margin([Fore.GREEN + message])
 
     def success_with_key(self, key: str):
         message = i18n.get(key)
@@ -131,7 +147,7 @@ class Prompt:
 
     def read(self, prompt: str) -> str:
         """Read input from user"""
-        return input(self.theme.text_color + prompt + self.theme.reset).strip()
+        return input(self._add_horizontal_margin(self.theme.text_color + prompt + self.theme.reset)).strip()
 
     def snippet(self, code: str, language: Optional[str] = "python", copy: bool = True):
         """Display code snippet with syntax highlighting"""
@@ -189,36 +205,31 @@ class Prompt:
                 + self.theme.box_bottom_right
             )
 
-            # Print the box top
-            print(self.theme.title_color + top_line + self.theme.reset)
-
-            # Print each line of code with proper indentation
+            snippet_lines = [self.theme.title_color + top_line + self.theme.reset]
             for line in lines:
                 visible_length = len(strip_ansi(line))
                 padding = box_width - visible_length - 2
-                print(
+                snippet_lines.append(
                     f"{self.theme.box_vertical} {line}{' ' * (padding - 1)}{self.theme.box_vertical}"
                 )
+            snippet_lines.append(self.theme.title_color + bottom_line + self.theme.reset)
 
-            # Print the box bottom
-            print(self.theme.title_color + bottom_line + self.theme.reset)
+            self._print_with_margin(snippet_lines)
 
             # Add copy option
             if copy:
-                print(
-                    f"\n{self.theme.text_color}➤ Press 'c' to copy code to clipboard, or any other key to continue...{self.theme.reset}"
-                )
+                self._print_with_margin([
+                    f"{self.theme.text_color}➤ Press 'c' to copy code to clipboard, or any other key to continue...{self.theme.reset}"
+                ])
                 key = self.get_key()
                 if key == "c":  # Enter key
                     pyperclip.copy(code)
-                    print(
+                    self._print_with_margin([
                         f"{self.theme.success_color}Code copied to clipboard!{self.theme.reset}"
-                    )
-                print()
-
+                    ])
         except Exception as e:
             # Fallback to non-highlighted version if highlighting fails
-            print(f"Warning: Syntax highlighting failed: {e}")
+            self._print_with_margin([f"Warning: Syntax highlighting failed: {e}"])
             # self.snippet(code, language=None)
 
     def format_tutorial_item(
@@ -244,11 +255,12 @@ class Prompt:
         )
 
     def format_progress(self, label: str, progress: float) -> str:
-        """Format progress with a progress bar"""
+        """Format progress with a progress bar, with margin"""
         bar_width = 20
         filled = int(bar_width * progress)
         bar = "█" * filled + "░" * (bar_width - filled)
-        return f"{self.theme.progress_color}{label}: [{bar}] {progress:.1%}{self.theme.reset}"
+        progress_line = f"{self.theme.progress_color}{label}: [{bar}] {progress:.1%}{self.theme.reset}"
+        return self._add_horizontal_margin(progress_line)
 
     def get_key(self):
         """Get a single keypress from the user"""
