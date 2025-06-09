@@ -65,7 +65,9 @@ class TutorialState:
             "mcp-client": TutorialGroup(
                 name="Mcp Client",
                 description="Make a MCP client",
-                tutorials=[],  # Add more tutorials as they are created
+                tutorials=[
+                    "FastMcpClient"
+                ],
             ),
             "miscellaneous": TutorialGroup(
                 name="Miscellaneous",
