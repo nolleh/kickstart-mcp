@@ -12,7 +12,7 @@ class FastMcpClient(TutorialBase):
         )
         self.target_file = "mcp-client/src/mcp_client/client.py"
         self.current_step = 1
-        self.total_steps = 3
+        self.total_steps = 5
 
     def check(self) -> bool:
         """Check if a specific step is completed"""
@@ -26,21 +26,38 @@ class FastMcpClient(TutorialBase):
                 "mcp" in content and "anthropic" in content and "python-dotenv" in content
             )
         elif self.current_step == 2:
-            # Check for client.py with basic structure
+            # Check for client.py with basic structure and connect_to_server
             if not self.verify_file_exists(self.target_file):
                 return False
             content = Path(self.target_file).read_text()
             return (
-                "class MCPClient" in content and "connect_to_server" in content and "process_query" in content
+                "class MCPClient" in content and "connect_to_server" in content
             )
         elif self.current_step == 3:
-            # Check for main entry point and chat loop
+            # Check for process_query implementation
             if not self.verify_file_exists(self.target_file):
                 return False
             content = Path(self.target_file).read_text()
             return (
-                "async def chat_loop" in content
+                "process_query" in content and "anthropic.messages.create" in content
             )
+        elif self.current_step == 4:
+            # Check for chat loop and main entry point
+            if not self.verify_file_exists(self.target_file):
+                return False
+            content = Path(self.target_file).read_text()
+            return (
+                "async def chat_loop(self):" in content and "async def cleanup(self):" in content
+            )
+        elif self.current_step == 5:
+            target = "mcp-client/src/mcp_client/__init__.py"
+            if not self.verify_file_exists(target):
+                return False
+            content = Path(target).read_text()
+            return (
+                "def main" in content and "async def run()" in content
+            )
+
         return False
 
     def run_step(self, step_id: int) -> bool:
@@ -50,13 +67,17 @@ class FastMcpClient(TutorialBase):
             self.step2()
         elif step_id == 3:
             self.step3()
+        elif step_id == 4:
+            self.step4()
+        elif step_id == 5:
+            self.step5()
         if not self.handle_editor_options(self.target_file if step_id > 1 else "mcp-client/pyproject.toml"):
             return False
         return True
 
     def step1(self):
         self.prompter.clear()
-        self.prompter.box("MCP Client Tutorial: Step 1 - Environment Setup")
+        self.prompter.box("Step 1 - Environment Setup")
         self.prompter.instruct(
             "In this step, you'll set up your Python environment and install the required dependencies for building an MCP client. We'll use a modern, isolated environment and follow best practices."
         )
@@ -79,12 +100,12 @@ $ uv add mcp anthropic python-dotenv
 
     def step2(self):
         self.prompter.clear()
-        self.prompter.box("MCP Client Tutorial: Step 2 - Writing the Client Code")
+        self.prompter.box("Step 2 - Server Connection")
         self.prompter.instruct(
-            "Now, let's write the core client code. This client will connect to any MCP server, list available tools, and interact with LLMs (like Claude) to process queries and call tools."
+            "In this step, we'll implement the server connection functionality. This is the foundation of our MCP client that allows it to communicate with any MCP server."
         )
         self.prompter.instruct(
-            "1. Create a file named client.py in your mcp-client directory(src/mcp_client/client.py).\n2. Add the following code to set up the basic structure, following best practices for async resource management and environment loading."
+            "1. Create a file named client.py in your mcp-client directory(src/mcp_client/client.py).\n2. Add the following code to set up the basic structure and server connection."
         )
         self.prompter.snippet(
             """import asyncio
@@ -110,35 +131,53 @@ class MCPClient:
         if not (is_python or is_js):
             raise ValueError('Server script must be a .py or .js file')
         command = 'python' if is_python else 'node'
+
         server_params = StdioServerParameters(
             command=command,
             args=[server_script_path],
             env=None
         )
+
         stdio_transport = await self.exit_stack.enter_async_context(stdio_client(server_params))
         self.stdio, self.write = stdio_transport
         self.session = await self.exit_stack.enter_async_context(ClientSession(self.stdio, self.write))
         await self.session.initialize()
+
         response = await self.session.list_tools()
         tools = response.tools
-        print('\nConnected to server with tools:', [tool.name for tool in tools])
+        print('Connected to server with tools:', [tool.name for tool in tools])"""
+        )
+        self.prompter.instruct(
+            "This code sets up the client and implements the server connection functionality. It handles both Python and JavaScript servers, establishes the connection, and lists available tools."
+        )
 
+    def step3(self):
+        self.prompter.clear()
+        self.prompter.box("Step 3 - Query Processing")
+        self.prompter.instruct(
+            "Now, let's implement the query processing functionality. This part handles user queries, interacts with the LLM (Claude), and manages tool calls."
+        )
+        self.prompter.snippet(
+            """
     async def process_query(self, query: str) -> str:
         messages = [
             {"role": "user", "content": query}
         ]
+
         response = await self.session.list_tools()
         available_tools = [{
             "name": tool.name,
             "description": tool.description,
             "input_schema": tool.inputSchema
         } for tool in response.tools]
+
         response = self.anthropic.messages.create(
             model="claude-3-5-sonnet-20241022",
             max_tokens=1000,
             messages=messages,
             tools=available_tools
         )
+
         final_text = []
         assistant_message_content = []
         for content in response.content:
@@ -160,21 +199,21 @@ class MCPClient:
                     tools=available_tools
                 )
                 final_text.append(response.content[0].text)
-        return "\n".join(final_text)
-"""
+        return "\n".join(final_text)"""
         )
         self.prompter.instruct(
-            "This code sets up the client, connects to a server, lists tools, and processes queries using Claude and tool calls."
+            "This code implements the query processing functionality. It handles user queries, manages conversations with Claude, and processes tool calls when needed."
         )
 
-    def step3(self):
+    def step4(self):
         self.prompter.clear()
-        self.prompter.box("MCP Client Tutorial: Step 3 - Running and Using the Client")
+        self.prompter.box("Step 4 - Interactive Chat Loop")
         self.prompter.instruct(
-            "Finally, let's add the interactive chat loop and the main entry point. This will allow you to run your client and interact with any MCP server."
+            "Let's add the interactive chat loop. This will allow you to run your client and interact with any MCP server."
         )
         self.prompter.snippet(
-            """    async def chat_loop(self):
+            """
+    async def chat_loop(self):
         print("\nMCP Client Started!")
         print("Type your queries or 'quit' to exit.")
         while True:
@@ -189,8 +228,17 @@ class MCPClient:
 
     async def cleanup(self):
         await self.exit_stack.aclose()
-
-async def main():
+    """)
+    def step5(self):
+        self.prompter.clear()
+        self.prompter.box("Step 5 - Make main func")
+        self.prompter.instruct("Finally, make the main entry point, and initalize client")
+        self.prompter.snippet(
+"""
+from .client import MCPClient
+import asyncio
+import sys
+async def run():
     if len(sys.argv) < 2:
         print("Usage: python client.py <path_to_server_script>")
         sys.exit(1)
@@ -201,13 +249,18 @@ async def main():
     finally:
         await client.cleanup()
 
+def main():
+    asyncio.run(run())
+
 if __name__ == "__main__":
-    import sys
-    asyncio.run(main())
-"""
+    main()"""
+        )
+
+        self.prompter.instruct(
+            "Now you can run your client with: uv run mcp-client <path_to_server_script>. Try connecting to your weather server or any other MCP server!"
         )
         self.prompter.instruct(
-            "Now you can run your client with: python client.py <path_to_server_script>. Try connecting to your weather server or any other MCP server!"
+            "If you followed the server tutorial, pass uv run mcp-client ../mcp-weather/src/mcp_weather/__init__.py"
         )
         self.prompter.instruct(
             "Congratulations! You've built a fully functional MCP client. You can now explore, extend, and integrate with any MCP-compatible server and tools."
