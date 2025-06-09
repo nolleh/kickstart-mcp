@@ -47,7 +47,7 @@ class Prompt:
         self.terminal_width = os.get_terminal_size().columns
         self.box_width = 40
         self.horizontal_margin = 2  # Number of spaces for left/right margin
-        self.vertical_margin = 0    # Number of empty lines for top/bottom margin
+        self.vertical_margin = 0  # Number of empty lines for top/bottom margin
 
     def _get_display_width(self, text: str) -> int:
         """Calculate the display width of text, accounting for multi-byte characters."""
@@ -113,9 +113,15 @@ class Prompt:
         """Display instruction from resource key."""
         message = i18n.get(key)
         if message:
-            self._print_with_margin([Fore.WHITE + message + "\n"])
+            # self._print_with_margin([Fore.WHITE + message + "\n"])
+            message = message.replace("\\n", "\n")
+            # print(message.split("\n"))
+            for line in message.split("\n"):
+                self._print_with_margin([Fore.WHITE + line + "\n"])
         else:
-            self._print_with_margin([Fore.YELLOW + f"Warning: No message found for key '{key}'\n"])
+            self._print_with_margin(
+                [Fore.YELLOW + f"Warning: No message found for key '{key}'\n"]
+            )
 
     def intense_instruct(self, message: str):
         self._print_with_margin([Fore.MAGENTA + Style.BRIGHT + message])
@@ -147,7 +153,11 @@ class Prompt:
 
     def read(self, prompt: str) -> str:
         """Read input from user"""
-        return input(self._add_horizontal_margin(self.theme.text_color + prompt + self.theme.reset)).strip()
+        return input(
+            self._add_horizontal_margin(
+                self.theme.text_color + prompt + self.theme.reset
+            )
+        ).strip()
 
     def snippet(self, code: str, language: Optional[str] = "python", copy: bool = True):
         """Display code snippet with syntax highlighting"""
@@ -212,21 +222,27 @@ class Prompt:
                 snippet_lines.append(
                     f"{self.theme.box_vertical} {line}{' ' * (padding - 1)}{self.theme.box_vertical}"
                 )
-            snippet_lines.append(self.theme.title_color + bottom_line + self.theme.reset)
+            snippet_lines.append(
+                self.theme.title_color + bottom_line + self.theme.reset
+            )
 
             self._print_with_margin(snippet_lines)
 
             # Add copy option
             if copy:
-                self._print_with_margin([
-                    f"{self.theme.text_color}➤ Press 'c' to copy code to clipboard, or any other key to continue...{self.theme.reset}"
-                ])
+                self._print_with_margin(
+                    [
+                        f"{self.theme.text_color}➤ Press 'c' to copy code to clipboard, or any other key to continue...{self.theme.reset}"
+                    ]
+                )
                 key = self.get_key()
                 if key == "c":  # Enter key
                     pyperclip.copy(code)
-                    self._print_with_margin([
-                        f"{self.theme.success_color}Code copied to clipboard!{self.theme.reset}"
-                    ])
+                    self._print_with_margin(
+                        [
+                            f"{self.theme.success_color}Code copied to clipboard!{self.theme.reset}"
+                        ]
+                    )
         except Exception as e:
             # Fallback to non-highlighted version if highlighting fails
             self._print_with_margin([f"Warning: Syntax highlighting failed: {e}"])

@@ -77,13 +77,9 @@ class FastMcpClient(TutorialBase):
 
     def step1(self):
         self.prompter.clear()
-        self.prompter.box("Step 1 - Environment Setup")
-        self.prompter.instruct(
-            "In this step, you'll set up your Python environment and install the required dependencies for building an MCP client. We'll use a modern, isolated environment and follow best practices."
-        )
-        self.prompter.instruct(
-            "1. Create a new project directory and initialize it with a pyproject.toml file.\n2. Confiure virtual enviorment/project configuration with your favorite tools.(in this tutorial, used hatch)\n3. Add the required dependencies: mcp, anthropic, python-dotenv."
-        )
+        self.prompter.box_with_key("fastmcp_client.step1.title")
+        self.prompter.instruct_with_key("fastmcp_client.step1.intro1")
+        self.prompter.instruct_with_key("fastmcp_client.step1.intro2")
         self.prompter.snippet(
             """# In your terminal:
 $ hatch new mcp-client
@@ -94,19 +90,13 @@ $ cd mcp-client
 $ uv add mcp anthropic python-dotenv
 """
         )
-        self.prompter.instruct(
-            "Make sure your pyproject.toml includes these dependencies. This ensures your client can communicate with MCP servers and use the Anthropic API."
-        )
+        self.prompter.instruct_with_key("fastmcp_client.step1.intro3")
 
     def step2(self):
         self.prompter.clear()
-        self.prompter.box("Step 2 - Server Connection")
-        self.prompter.instruct(
-            "In this step, we'll implement the server connection functionality. This is the foundation of our MCP client that allows it to communicate with any MCP server."
-        )
-        self.prompter.instruct(
-            "1. Create a file named client.py in your mcp-client directory(src/mcp_client/client.py).\n2. Add the following code to set up the basic structure and server connection."
-        )
+        self.prompter.box_with_key("fastmcp_client.step2.title")
+        self.prompter.instruct_with_key("fastmcp_client.step2.intro1")
+        self.prompter.instruct_with_key("fastmcp_client.step2.intro2")
         self.prompter.snippet(
             """import asyncio
 from typing import Optional
@@ -147,16 +137,12 @@ class MCPClient:
         tools = response.tools
         print('Connected to server with tools:', [tool.name for tool in tools])"""
         )
-        self.prompter.instruct(
-            "This code sets up the client and implements the server connection functionality. It handles both Python and JavaScript servers, establishes the connection, and lists available tools."
-        )
+        self.prompter.instruct_with_key("fastmcp_client.step2.intro3")
 
     def step3(self):
         self.prompter.clear()
-        self.prompter.box("Step 3 - Query Processing")
-        self.prompter.instruct(
-            "Now, let's implement the query processing functionality. This part handles user queries, interacts with the LLM (Claude), and manages tool calls."
-        )
+        self.prompter.box_with_key("fastmcp_client.step3.title")
+        self.prompter.instruct_with_key("fastmcp_client.step3.intro1")
         self.prompter.snippet(
             """
     async def process_query(self, query: str) -> str:
@@ -201,16 +187,12 @@ class MCPClient:
                 final_text.append(response.content[0].text)
         return "\n".join(final_text)"""
         )
-        self.prompter.instruct(
-            "This code implements the query processing functionality. It handles user queries, manages conversations with Claude, and processes tool calls when needed."
-        )
+        self.prompter.instruct_with_key("fastmcp_client.step3.intro2")
 
     def step4(self):
         self.prompter.clear()
-        self.prompter.box("Step 4 - Interactive Chat Loop")
-        self.prompter.instruct(
-            "Let's add the interactive chat loop. This will allow you to run your client and interact with any MCP server."
-        )
+        self.prompter.box_with_key("fastmcp_client.step4.title")
+        self.prompter.instruct_with_key("fastmcp_client.step4.intro1")
         self.prompter.snippet(
             """
     async def chat_loop(self):
@@ -228,13 +210,15 @@ class MCPClient:
 
     async def cleanup(self):
         await self.exit_stack.aclose()
-    """)
+    """
+        )
+
     def step5(self):
         self.prompter.clear()
-        self.prompter.box("Step 5 - Make main func")
-        self.prompter.instruct("Finally, make the main entry point, and initalize client")
+        self.prompter.box_with_key("fastmcp_client.step5.title")
+        self.prompter.instruct_with_key("fastmcp_client.step5.intro1")
         self.prompter.snippet(
-"""
+            """
 from .client import MCPClient
 import asyncio
 import sys
@@ -255,16 +239,9 @@ def main():
 if __name__ == "__main__":
     main()"""
         )
-
-        self.prompter.instruct(
-            "Now you can run your client with: uv run mcp-client <path_to_server_script>. Try connecting to your weather server or any other MCP server!"
-        )
-        self.prompter.instruct(
-            "If you followed the server tutorial, pass uv run mcp-client ../mcp-weather/src/mcp_weather/__init__.py"
-        )
-        self.prompter.instruct(
-            "Congratulations! You've built a fully functional MCP client. You can now explore, extend, and integrate with any MCP-compatible server and tools."
-        )
+        self.prompter.instruct_with_key("fastmcp_client.step5.intro2")
+        self.prompter.instruct_with_key("fastmcp_client.step5.intro3")
+        self.prompter.instruct_with_key("fastmcp_client.step5.intro4")
 
     def run(self) -> bool:
         """Run the tutorial"""
